@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d2332" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" type="text/css">
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+  <title>Track Download</title>
+  <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAQAAAD/5HvMAAAAsUlEQVR4Ae3ZMQ6CQBBA0S8NZ5Djack5RT0AoSLhEFivLRUOMTuh+H9asnndJAxmZvarlp6ZUmlmelqId2WiVJ6JjmAXHpSEeXIh1I2SNHdCvdJAb0J90kArocpm/i/+viBBgsru7H8TeUdQDZAgQaEE1QHFE7TNXSYonKBg7jJBggS5ywQJ8v9QPkiQINb808L5jy/nPk81DCmcgYZgHWN1zkh39Ai8VMMsB4/AZmb2BelnnnVrky1sAAAAAElFTkSuQmCC" rel="icon" type="image/x-icon" />
+  <link rel="stylesheet" href="./static/styles2.css" type="text/css">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    :root {
+      --mdc-theme-primary: #0d2332;
+    }
+    :focus {
+      outline: none !important;
+    }
+    .blurred_bg {
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      right: 0;
+      left: 0;
+      margin: 0;
+      border: 0;
+      filter: blur(5px);
+      transform: scale(1.1);
+      display: block;
+      background: url("./static/Background.jpg") #0d2332 center/cover no-repeat;
+    }
+    .main_page_body {
+      position: relative;
+    }
+    .mdc-card {
+      width: auto;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 8px !important;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .mdc-card:hover {
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    }
+    .card-body-text {
+      padding: 1rem;
+      height: 100% !important;
+      font-size: 18px !important;
+      color: rgba(0,0,0,.54);
+    }
+    .mdc-typography--body1 {
+      height: inherit !important;
+      background-color: #f5f5f5;
+      border-radius: 8px !important;
+    }
+    .mdc-list {
+      width: auto;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 8px !important;
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      background-color: #f5f5f5;
+    }
+    .mdc-list:hover {
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    }
+    .mdc-list-item__graphic {
+      margin-left: 0;
+      margin-right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .mdc-list-item__meta {
+      color: #0d2332;
+      cursor: pointer;
+    }
+    .mdc-layout-grid__inner {
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .mdc-layout-grid {
+      max-width: 950px;
+    }
+    .page-form {
+      padding: 0;
+      margin: 0;
+      width: 100% !important;
+    }
+    .textfield_span_width_full {
+      margin-right: 5px;
+    }
+  </style>
+  <script>
+    function loadNewPage(pageUrl){
+      window.open(pageUrl, '_blank');
+    }
+  </script>
+</head>
+<body>
+  <header class="mdc-top-app-bar mdc-top-app-bar--short">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <a href="#" onclick="window.history.back();" class="material-icons mdc-top-app-bar__navigation-icon">arrow_back</a>
+        <span class="mdc-top-app-bar__title">Track Download</span>
+      </section>
+    </div>
+  </header>
+  <div class="blurred_bg"></div>
+  <div class="main_page_body mdc-top-app-bar--short-fixed-adjust">
+    <div class="mdc-layout-grid">
+      <div class="mdc-layout-grid__inner">
+        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--align-middle mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-4-phone mdc-layout-grid__cell--span-8-tablet">
+          <div class="mdc-card mdc-elevation-transition resources-tab-card">
+            <div class="padded-resource-card">
+                <h2 class="resource-card-title mdc-typography mdc-typography--headline6">Download</h2>
+                <h3 class="resource-card-subtitle mdc-typography mdc-typography--subtitle2">https://youtube.com</h3>
+            </div>
+            <div class="resource-card-secondary mdc-typography mdc-typography--body2">
+              Download any track from YouTube, just paste the link of the video in the box below and click the download button!
+            </div>
+            <div class="mdc-card__actions adjusted-card-actions">
+              <div class="mdc-text-field mdc-text-field--outlined textfield_span_width_full" id="HIBP_Textfield">
+                <form name="submitLink" method="post" action="." class="page-form">
+                  <input name="videoURL" class="mdc-text-field__input" type="url" autocomplete="off">
+                </form>
+                <div class="mdc-notched-outline">
+                  <div class="mdc-notched-outline__leading leading-notch-textfield"></div>
+                  <div class="mdc-notched-outline__notch">
+                    <label class="mdc-floating-label">Link</label>
+                  </div>
+                  <div class="mdc-notched-outline__trailing trailling-notch-textfield"></div>
+                </div>
+              </div>
+              <div class="mdc-card__action-icons">    
+                <button onclick="document.submitLink.submit();" class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded" title="More options" data-mdc-ripple-is-unbounded="true">arrow_forward</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function oneElementInit(a, b) {
+      if (null !== document.querySelector(a))
+        return new b(document.querySelector(a));
+    }
+    var cdSiteTopAppBar = oneElementInit(".mdc-top-app-bar", mdc.topAppBar.MDCTopAppBar);
+    var downloadTextField = oneElementInit(".mdc-text-field", mdc.textField.MDCTextField);
+    window.mdc.autoInit();
+  </script>
+</body>
+</html>
