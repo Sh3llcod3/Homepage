@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0d2332" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@2.3.1/dist/material-components-web.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" type="text/css">
-  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-  <title>Track Download</title>
-  <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAQAAAD/5HvMAAAAsUlEQVR4Ae3ZMQ6CQBBA0S8NZ5Djack5RT0AoSLhEFivLRUOMTuh+H9asnndJAxmZvarlp6ZUmlmelqId2WiVJ6JjmAXHpSEeXIh1I2SNHdCvdJAb0J90kArocpm/i/+viBBgsru7H8TeUdQDZAgQaEE1QHFE7TNXSYonKBg7jJBggS5ywQJ8v9QPkiQINb808L5jy/nPk81DCmcgYZgHWN1zkh39Ai8VMMsB4/AZmb2BelnnnVrky1sAAAAAElFTkSuQmCC" rel="icon" type="image/x-icon" />
+  <script src="https://unpkg.com/material-components-web@2.3.1/dist/material-components-web.min.js"></script>
+  <title>HomePage</title>
+  <link rel="icon" href="./static/favicon.png">
   <link rel="stylesheet" href="./static/styles2.css" type="text/css">
   <style>
     html {
       scroll-behavior: smooth;
+      height: 100%;
     }
     :root {
       --mdc-theme-primary: #0d2332;
@@ -99,6 +100,9 @@
     .textfield_span_width_full {
       margin-right: 5px;
     }
+    .mdc-form-field > label {
+    	color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));
+    }
   </style>
   <script>
     function loadNewPage(pageUrl){
@@ -111,7 +115,7 @@
     <div class="mdc-top-app-bar__row">
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
         <a href="#" onclick="window.history.back();" class="material-icons mdc-top-app-bar__navigation-icon">arrow_back</a>
-        <span class="mdc-top-app-bar__title">Track Download</span>
+        <span class="mdc-top-app-bar__title">HomePage</span>
       </section>
     </div>
   </header>
@@ -122,29 +126,69 @@
         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--align-middle mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-4-phone mdc-layout-grid__cell--span-8-tablet">
           <div class="mdc-card mdc-elevation-transition resources-tab-card">
             <div class="padded-resource-card">
-                <h2 class="resource-card-title mdc-typography mdc-typography--headline6">Download</h2>
-                <h3 class="resource-card-subtitle mdc-typography mdc-typography--subtitle2">https://youtube.com</h3>
+                <h2 class="resource-card-title mdc-typography mdc-typography--headline6">Download Audio</h2>
+                <h3 class="resource-card-subtitle mdc-typography mdc-typography--subtitle2">with youtube_dl</h3>
             </div>
-            <div class="resource-card-secondary mdc-typography mdc-typography--body2">
-              Download any track from YouTube, just paste the link of the video in the box below and click the download button!
-            </div>
-            <div class="mdc-card__actions adjusted-card-actions">
-              <div class="mdc-text-field mdc-text-field--outlined textfield_span_width_full" id="HIBP_Textfield">
-                <form name="submitLink" method="post" action="." class="page-form">
-                  <input name="videoURL" class="mdc-text-field__input" type="url" autocomplete="off">
-                </form>
-                <div class="mdc-notched-outline">
-                  <div class="mdc-notched-outline__leading leading-notch-textfield"></div>
-                  <div class="mdc-notched-outline__notch">
-                    <label class="mdc-floating-label">Link</label>
+            <form name="submitLink" method="post" action="." class="page-form">
+              <div class="resource-card-secondary mdc-typography mdc-typography--body2">
+                Download the audio track from almost any internet video, just paste the link in the box below, set your options, and click download!<br>
+                <br>
+                Attach Thumbnail:
+                <div class="mdc-form-field" id="checkbox-form-field">
+                  <div class="mdc-checkbox">
+                    <input type="checkbox"
+                           class="mdc-checkbox__native-control"
+                           name="attach_thumb"/>
+                    <div class="mdc-checkbox__background">
+                      <svg class="mdc-checkbox__checkmark"
+                           viewBox="0 0 24 24">
+                        <path class="mdc-checkbox__checkmark-path"
+                              fill="none"
+                              d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                      </svg>
+                      <div class="mdc-checkbox__mixedmark"></div>
+                    </div>
                   </div>
-                  <div class="mdc-notched-outline__trailing trailling-notch-textfield"></div>
+                </div>
+                <br>
+                Format Preference:
+                <div class="mdc-form-field" id="form-field-1">
+                  <div class="mdc-radio" id="radio-btn-1">
+                    <input class="mdc-radio__native-control" type="radio" id="radio-1" name="format_preference" checked>
+                    <div class="mdc-radio__background">
+                      <div class="mdc-radio__outer-circle"></div>
+                      <div class="mdc-radio__inner-circle"></div>
+                    </div>
+                  </div>
+                  <label for="radio-1">MP3</label>
+                </div>
+                <div class="mdc-form-field" id="form-field-2">
+                  <div class="mdc-radio" id="radio-btn-2">
+                    <input class="mdc-radio__native-control" type="radio" id="radio-2" name="format_preference">
+                    <div class="mdc-radio__background">
+                      <div class="mdc-radio__outer-circle"></div>
+                      <div class="mdc-radio__inner-circle"></div>
+                    </div>
+                  </div>
+                  <label for="radio-2">M4A</label>
                 </div>
               </div>
-              <div class="mdc-card__action-icons">    
-                <button onclick="document.submitLink.submit();" class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded" title="More options" data-mdc-ripple-is-unbounded="true">arrow_forward</button>
+              <div class="mdc-card__actions adjusted-card-actions">
+                <div class="mdc-text-field mdc-text-field--outlined textfield_span_width_full" id="HIBP_Textfield">
+                  <input name="videoURL" class="mdc-text-field__input" type="url" autocomplete="off">
+                  <div class="mdc-notched-outline">
+                    <div class="mdc-notched-outline__leading leading-notch-textfield"></div>
+                    <div class="mdc-notched-outline__notch">
+                      <label class="mdc-floating-label">Link</label>
+                    </div>
+                    <div class="mdc-notched-outline__trailing trailling-notch-textfield"></div>
+                  </div>
+                </div>
+                <div class="mdc-card__action-icons">
+                  <button onclick="sendDownloadRequest();" class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded" title="More options" data-mdc-ripple-is-unbounded="true">arrow_forward</button>
+                </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -157,6 +201,37 @@
     }
     var cdSiteTopAppBar = oneElementInit(".mdc-top-app-bar", mdc.topAppBar.MDCTopAppBar);
     var downloadTextField = oneElementInit(".mdc-text-field", mdc.textField.MDCTextField);
+    var radio1 = oneElementInit("#radio-btn-1", mdc.radio.MDCRadio.attachTo);
+    var radio2 = oneElementInit("#radio-btn-2", mdc.radio.MDCRadio.attachTo);
+    var formField1 = oneElementInit("#form-field-1", mdc.formField.MDCFormField.attachTo);
+    var formField2 = oneElementInit("#form-field-2", mdc.formField.MDCFormField.attachTo);
+    formField1.input = radio1;
+    formField2.input = radio2;
+    radio1.value = "mp3";
+    radio2.value = "m4a";
+    radio1.listen('click', () => {
+      radio1.checked = true;
+      radio2.checked = false;
+    });
+
+    radio2.listen('click', () => {
+      radio2.checked = true;
+      radio1.checked = false;
+    });
+
+    var checkbox = oneElementInit(".mdc-checkbox", mdc.checkbox.MDCCheckbox.attachTo);
+    var checkboxFormField = oneElementInit("#checkbox-form-field", mdc.formField.MDCFormField.attachTo);
+    checkboxFormField.input = checkbox;
+    checkbox.checked = true;
+
+    function sendDownloadRequest() {
+      if (downloadTextField.value !== "" && downloadTextField.valid == true) {
+        //document.submitLink.submit();
+      } else {
+        //
+      }
+    }
+
     window.mdc.autoInit();
   </script>
 </body>
