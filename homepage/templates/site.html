@@ -106,6 +106,9 @@
     .mdc-linear-progress {
     	margin-bottom: 5px;
     }
+    #Previous-Track-Table {
+      display: none;
+    }
   </style>
   <script>
     function loadNewPage(pageUrl){
@@ -194,13 +197,10 @@
             </div>
           </div>
         </div>
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--align-middle mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-4-phone mdc-layout-grid__cell--span-8-tablet">
+        <div id="Previous-Track-Table" class="mdc-layout-grid__cell mdc-layout-grid__cell--align-middle mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-4-phone mdc-layout-grid__cell--span-8-tablet">
           <ul class="mdc-list unselectable-text">
 
-            <li class="mdc-list-item">
-              <span class="mdc-list-item__text">Aero Chord - Take Me Home (feat. Nevve) [Monstercat Release]</span>
-              <span class="mdc-list-item__meta material-icons" aria-hidden="true" title="View GitHub Profile" onclick="loadNewPage('https://github.com/sh3llcod3')">cloud_download</span>
-            </li>
+            {{ previous_items|safe }}
 
           </ul>
         </div>
@@ -316,19 +316,18 @@
         }
         XHR.onreadystatechange = function(evt) {
           if (XHR.readyState == 4 && XHR.status == 200) {
-            displayMDCSnackbar("Received data, decoding and downloading, almost done.", "Cancel", function(){window.location.reload(false);}, 10000);
             var blob = b64toBlob(evt.target.response["file_contents"], evt.target.response["format"]);
-            let a = document.createElement("a");
-            a.style = "display: none";
-            document.body.appendChild(a);
+            let downloadElement = document.createElement("a");
+            downloadElement.style = "display: none";
+            document.body.appendChild(downloadElement);
             let url = window.URL.createObjectURL(blob);
-            a.href = url;
-            a.download = evt.target.response["file_name"];
-            a.click();
+            downloadElement.href = url;
+            downloadElement.download = evt.target.response["file_name"];
+            downloadElement.click();
             window.URL.revokeObjectURL(url);
             window.location.reload();
 
-          } else {
+          } else if (XHR.readyState == 4 && XHR.status >= 300) {
             mdcSnackBar.listen("MDCSnackbar:closing", function() {
               mdcSnackBar.open();
             });
@@ -354,6 +353,17 @@
       </div>
     </div>
     `;
+
+    function getPreviousTrack(trackPath){
+      let a = document.createElement('a')
+      a.href = trackPath
+      a.download = trackPath.split('/').pop()
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+
+    {{ extra_js|safe }}
 
     window.mdc.autoInit();
   </script>

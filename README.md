@@ -1,36 +1,39 @@
-# AirGUI
+# HomePage
 
-AirGUI is an extensive graphical interface-based wireless-network auditing suite.
-It integrates and simplifies various different methods and tools of assessing a
-network's security. AirGUI leverages the abstraction and intuitiveness provided
-by a Graphical User Interface (GUI) to create an experience that is easy to use,
-regardless of the auditor's skill or experience level with the lower level tools.
-
-Since AirGUI contains a lot of tools that could cause major disruption to a wireless
-network if it was misused, strict compliance of local laws and explicit permission
-is required from the owner of the network in question.
+HomePage is a simple flask webapp that allows downloading the audio track from almost any internet video.
+It is intended to be deployed inside a private network, and hosts within the network can access
+and download the tracks they want. HomePage's stand-out features are its Material Design interface
+and simplicity. HomePage uses `youtube_dl` to download the videos, so quite a few sites are supported.
 
 ## Setup & Prerequsites
 
-Before one can use AirGUI they must perform a few steps to setup their system first.
-The setup steps are designed to be as simple and as easy to follow along as possible.
-Additionally, the setup steps can be easily reverted (as it does not affect system files, binaries, etc.)
-if any adverse impact to the system was observed.
+HomePage should be deployable on almost any Debian-like system that uses the `apt` package manager.
+There are multiple ways to install and deploy the webapp, but the simplest way, is to just install
+it direct from PyPi, assuming `python3.6` or above is present on the system.
 
-These steps may differ slightly depending on the type of hardware/operating-system being used.
-AirGUI works on most modern (x86) laptop and desktop computer hardware. You need to run a Debian/Ubuntu
-based distribution of Linux with a fairly recent kernel. In addition to this, your distribution
-must use the Apt package manager as its default package manager (support for other package managers may be
-added in the future). A stable, fast internet connection is recommended in order to fetch and build
-various different dependencies.
+```
+python3 -m pip install homepage
+homepage -i
+homepage -fdp
+```
+
+Alternatively, you could also clone it from GitHub.
+
+```
+git clone https://github.com/Sh3llcod3/HomePage.git
+cd HomePage/
+python3 -m pip install -r requirements.txt
+cd homepage/
+./homepage.py -i
+./homepage.py -fdp
+```
 
 ## Usage
 
 
-## Troubleshooting
+
+## FAQ & Troubleshooting
 
 
-## Contributing
 
-
-## Code of Conduct
+## To-do

@@ -13,11 +13,11 @@ from sys import argv, exit
 
 import easyparse
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, safe_join, send_from_directory
 
 import youtube_dl
 
-version_string = " * HomePage, v0.1.0\n * Copyright (c) 2019 Yudhajit N. (MIT License)"
+version_string = " * HomePage, v0.1.0\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
 
 
 # Setup our Video class, this will handle the youtube_dl side of things.
@@ -86,6 +86,26 @@ class Video():
         return file_to_send
 
 
+list_item_template = """<li class="mdc-list-item">
+    <span class="mdc-list-item__text">{file_full_name}</span>
+    <span class="mdc-list-item__meta material-icons" aria-hidden="true" title="Download Track" onclick="getPreviousTrack('{previous_trackpath}')">cloud_download</span>
+</li>"""  # noqa: E501
+
+
+# Generate the html elements for the previous files.
+def update_file_list():
+    path, dirs, files = next(walk("./downloads/"))
+    prev_count = len(files)
+    if prev_count == 0:
+        return ["", ""]
+    elif prev_count > 0:
+        list_buffer = str()
+        end_js = 'document.getElementById("Previous-Track-Table").style.display = "block";'
+        for i in files:
+            list_buffer += list_item_template.format(file_full_name=i, previous_trackpath=safe_join("./transfer/", i))
+        return [list_buffer, end_js]
+
+
 app = Flask(__name__, static_url_path='/static')
 
 
@@ -94,7 +114,8 @@ def index_page():
     if request.method == "GET":
         # with open("./templates/site.html", "r") as site:
         #    return site.read()
-        return render_template("./site.html")
+        table_items, js_addition = update_file_list()
+        return render_template("./site.html", previous_items=table_items, extra_js=js_addition)
 
     if request.method == "POST":
         dl_request = Video(request.form)
@@ -105,6 +126,11 @@ def index_page():
             "file_contents": file_bytes,
             "format": f"audio/{dl_request.mime_type}"
         })
+
+
+@app.route('/transfer/<filepath>', methods=["GET"])
+def download_file(filepath):
+    return send_from_directory('./downloads/', filepath, as_attachment=True)
 
 
 def main():
@@ -172,14 +198,18 @@ def main():
         exit()
 
     # Add the iptables rule
+    active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
+                                     shell=True).decode('utf-8')  # noqa: S602
+    active_interface = active_interface.rstrip()
+
     def remove_rule():
         print("\n * Reverting iptables rule.")
-        call(("sudo iptables -t nat -D PREROUTING -i enp2s0 "  # noqa: S607
+        call((f"sudo iptables -t nat -D PREROUTING -i {active_interface} "  # noqa: S607
               "-p tcp --dport 80 -j REDIRECT --to-port 5000"), shell=True)  # noqa: S602
 
     if parser.is_present("-f"):
         print(" * Adding iptables rule.")
-        call(("sudo iptables -t nat -A PREROUTING -i enp2s0 "  # noqa: S607
+        call((f"sudo iptables -t nat -A PREROUTING -i {active_interface} "  # noqa: S607
               "-p tcp --dport 80 -j REDIRECT --to-port 5000"), shell=True)  # noqa: S602
         register(remove_rule)
 
@@ -195,6 +225,10 @@ def main():
 
     # Run the app
     if parser.is_present("-d"):
+        local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
+                                 "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
+        print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}")
+        print(f" * My default interface is: {active_interface}")
         app.run(host='0.0.0.0', port=5000)  # noqa: S104
 
 
