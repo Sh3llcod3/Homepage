@@ -6,8 +6,6 @@ from __future__ import unicode_literals
 from atexit import register
 from base64 import b64encode
 from datetime import datetime
-from io import BytesIO
-from json import dumps
 from os import walk
 from shutil import make_archive
 from subprocess import call, check_output  # noqa: S404
@@ -15,7 +13,7 @@ from sys import argv, exit
 
 import easyparse
 
-from flask import Flask, jsonify, render_template, request, send_file
+from flask import Flask, jsonify, render_template, request
 
 import youtube_dl
 
@@ -94,9 +92,9 @@ app = Flask(__name__, static_url_path='/static')
 @app.route('/', methods=["GET", "POST"])
 def index_page():
     if request.method == "GET":
-        with open("./templates/site.html", "r") as site:
-            return site.read()
-        # return render_template("./site.html")
+        # with open("./templates/site.html", "r") as site:
+        #    return site.read()
+        return render_template("./site.html")
 
     if request.method == "POST":
         dl_request = Video(request.form)

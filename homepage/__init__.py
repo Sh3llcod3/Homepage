@@ -1,2 +1,2 @@
-name = "home_page"
-from .app import *
+from .homepage import *
+name = "homepage"
