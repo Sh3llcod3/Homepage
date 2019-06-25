@@ -199,7 +199,7 @@
 
             <li class="mdc-list-item">
               <span class="mdc-list-item__text">Aero Chord - Take Me Home (feat. Nevve) [Monstercat Release]</span>
-              <span class="mdc-list-item__meta material-icons" aria-hidden="true" title="View GitHub Profile" onclick="loadNewPage('https://github.com/sh3llcod3')">arrow_downward</span>
+              <span class="mdc-list-item__meta material-icons" aria-hidden="true" title="View GitHub Profile" onclick="loadNewPage('https://github.com/sh3llcod3')">cloud_download</span>
             </li>
 
           </ul>
@@ -270,6 +270,26 @@
       mdcSnackBar.open();
     }
 
+    const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+      const byteCharacters = window.atob(b64Data);
+      const byteArrays = [];
+
+      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+
+      const blob = new Blob(byteArrays, {type: contentType});
+      return blob;
+    }
+
     function sendDownloadRequest() {
       if (downloadTextField.value !== "" && downloadTextField.valid == true) {
         document.getElementsByClassName("adjusted-card-actions")[0].innerHTML = linearProgressBar;
@@ -278,9 +298,8 @@
         document.getElementById("form-field-2").style.display = "none";
         document.getElementById("checkbox-control").style.display = "none";
         document.getElementById("checkbox-form-field").style.display = "none";
-        //document.submitLink.submit();
-
         var XHR = new XMLHttpRequest();
+        XHR.responseType = 'json';
         var FD  = new FormData();
         FD.append("videoURL", downloadTextField.value);
 
@@ -295,10 +314,29 @@
         } else {
           FD.append("attach_thumb", "no");
         }
+        XHR.onreadystatechange = function(evt) {
+          if (XHR.readyState == 4 && XHR.status == 200) {
+            displayMDCSnackbar("Received data, decoding and downloading, almost done.", "Cancel", function(){window.location.reload(false);}, 10000);
+            var blob = b64toBlob(evt.target.response["file_contents"], evt.target.response["format"]);
+            let a = document.createElement("a");
+            a.style = "display: none";
+            document.body.appendChild(a);
+            let url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = evt.target.response["file_name"];
+            a.click();
+            window.URL.revokeObjectURL(url);
+            window.location.reload();
 
+          } else {
+            mdcSnackBar.listen("MDCSnackbar:closing", function() {
+              mdcSnackBar.open();
+            });
+            displayMDCSnackbar("Encountered an error, refresh the page and try again.", "Refresh", function(){window.location.reload(false);}, 10000);
+          }
+        }
         XHR.open('POST', './');
         XHR.send(FD);
-
       } else {
         displayMDCSnackbar("Please ensure that the link is valid and not empty.", "OK", function(){}, 5000);
       }
