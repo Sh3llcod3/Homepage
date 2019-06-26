@@ -9,7 +9,7 @@ setuptools.setup(
     version="0.1.0",
     author="Sh3llcod3",
     author_email="no-reply@gmail.co.uk",
-    description="A simple flask app to download the audio track from almost any internet video.",
+    description="A simple flask webapp to download the audio track from almost any internet video.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Sh3llcod3/HomePage",
@@ -19,12 +19,14 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
         "Topic :: Multimedia :: Sound/Audio",
+        "Framework :: Flask",
+        "Environment :: Web Environment",
     ),
-    install_requires=['easyparse'],
+    install_requires=['easyparse', 'Flask', 'youtube_dl'],
     entry_points={
         'console_scripts': [
             'homepage=homepage:main',
         ],
     },
-    python_requires='>=3.6+',
+    python_requires='>=3.6',
 )
