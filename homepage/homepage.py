@@ -14,6 +14,8 @@ import easyparse
 
 from flask import Flask, render_template, request, safe_join, send_from_directory
 
+from gevent.pywsgi import WSGIServer
+
 import youtube_dl
 
 version_string = " * HomePage, v0.1.0\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
@@ -29,6 +31,23 @@ storage_folder = path.expanduser(storage_folder)
 downloads_folder = path.expanduser(downloads_folder)
 
 
+# Setup our youtube_dl logger class.
+class YTDLLogger():
+    def debug(self, msg):
+        pass
+
+    def warning(self, msg):
+        pass
+
+    def error(self, msg):
+        print(msg)
+
+
+def ytdl_hook(progress):
+    if progress['status'] == 'finished':
+        print(' * Downloaded video, now converting...')
+
+
 # Setup our Video class, this will handle the youtube_dl side of things.
 class Video():
 
@@ -42,8 +61,10 @@ class Video():
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': f'{self.mime_type}',
-                'preferredquality': '192',
+                'preferredquality': post_request["quality_preference"],
             }],
+            'logger': YTDLLogger(),
+            'progress_hooks': [ytdl_hook],
             'outtmpl': f'{downloads_folder}/%(title)s.%(ext)s'
         }
         if post_request["attach_thumb"].lower() == "yes":
@@ -238,7 +259,12 @@ def main():
                                  "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
         print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}")
         print(f" * My default interface is: {active_interface}")
-        app.run(host='0.0.0.0', port=5000)  # noqa: S104
+
+        try:
+            http_server = WSGIServer(('', 5000), app, log=None, error_log='default')
+            http_server.serve_forever()
+        except(KeyboardInterrupt):
+            pass
 
 
 if __name__ == "__main__":

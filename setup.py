@@ -14,15 +14,15 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Sh3llcod3/HomePage",
     packages=setuptools.find_packages(),
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
         "Topic :: Multimedia :: Sound/Audio",
         "Framework :: Flask",
         "Environment :: Web Environment",
-    ),
-    install_requires=['easyparse', 'Flask', 'youtube_dl'],
+    ],
+    install_requires=['easyparse', 'Flask', 'youtube_dl', 'gevent'],
     entry_points={
         'console_scripts': [
             'homepage=homepage:main',

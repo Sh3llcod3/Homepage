@@ -109,6 +109,9 @@
     #Previous-Track-Table {
       display: none;
     }
+    #site-menu-anchor {
+      display: inline;
+    }
   </style>
   <script>
     function loadNewPage(pageUrl){
@@ -177,6 +180,24 @@
                 </div>
                 <label for="radio-2">M4A</label>
               </div>
+              <br>
+              <span id="quality-selection">Preferred Quality:&nbsp;&nbsp;</span>
+              <div id="site-menu-anchor" class="mdc-menu-surface--anchor">
+                <button class="mdc-button" id="menu-opener-btn">Good (192k, Medium)</button>
+                <div class="mdc-menu mdc-menu-surface" id="main-quality-menu">
+                  <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
+                    <li class="mdc-list-item" role="menuitem" id="menu-pref-1">
+                      <span class="mdc-list-item__text">Standard (128k, Fast)</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem" id="menu-pref-2">
+                      <span class="mdc-list-item__text">Good (192k, Medium)</span>
+                    </li>
+                    <li class="mdc-list-item" role="menuitem" id="menu-pref-3">
+                      <span class="mdc-list-item__text">Best (256k, Slow)</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
             <div class="mdc-card__actions adjusted-card-actions">
               <div class="mdc-text-field mdc-text-field--outlined textfield_span_width_full" id="HIBP_Textfield">
@@ -241,7 +262,7 @@
     var formField2 = oneElementInit("#form-field-2", mdc.formField.MDCFormField.attachTo);
     var previousList = oneElementInit(".mdc-list", mdc.list.MDCList.attachTo);
     oneElementInit("#submit-main-form", mdc.ripple.MDCRipple.attachTo);
-    initElement("mdc-button",mdc.ripple.MDCRipple.attachTo);
+    initElement("mdc-button", mdc.ripple.MDCRipple.attachTo);
     formField1.input = radio1;
     formField2.input = radio2;
     radio1.value = "mp3";
@@ -260,6 +281,23 @@
     var checkboxFormField = oneElementInit("#checkbox-form-field", mdc.formField.MDCFormField.attachTo);
     checkboxFormField.input = checkbox;
     checkbox.checked = true;
+
+    var qualityDict = {
+      "Standard (128k, Fast)": 128,
+      "Good (192k, Medium)": 192,
+      "Best (256k, Slow)": 256
+    };
+
+    var siteMenu = oneElementInit("#main-quality-menu", mdc.menu.MDCMenu.attachTo);
+    document.getElementById("menu-opener-btn").addEventListener("click", function(evt){
+        siteMenu.open = !siteMenu.open;
+    });
+    siteMenu.listen("MDCMenu:selected", function(evt){
+      document.getElementById("menu-opener-btn").innerHTML = evt.detail.item.innerText;
+    });
+    oneElementInit("#menu-pref-1", mdc.ripple.MDCRipple.attachTo);
+    oneElementInit("#menu-pref-2", mdc.ripple.MDCRipple.attachTo);
+    oneElementInit("#menu-pref-3", mdc.ripple.MDCRipple.attachTo);
 
     var mdcSnackBar = oneElementInit(".mdc-snackbar", mdc.snackbar.MDCSnackbar.attachTo);
     function displayMDCSnackbar(a, b, c, d) {
@@ -287,6 +325,8 @@
         document.getElementById("form-field-2").style.display = "none";
         document.getElementById("checkbox-control").style.display = "none";
         document.getElementById("checkbox-form-field").style.display = "none";
+        document.getElementById("quality-selection").style.display = "none";
+        document.getElementById("site-menu-anchor").style.display = "none";
         var XHR = new XMLHttpRequest();
         var FD  = new FormData();
         FD.append("videoURL", downloadTextField.value);
@@ -302,6 +342,9 @@
         } else {
           FD.append("attach_thumb", "no");
         }
+
+        FD.append("quality_preference", qualityDict[document.getElementById("menu-opener-btn").innerHTML]);
+
         XHR.onreadystatechange = function(evt) {
           if (XHR.readyState == 4 && XHR.status == 200) {
             getPreviousTrack(evt.target.responseText);
