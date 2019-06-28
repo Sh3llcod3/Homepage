@@ -18,7 +18,7 @@ from gevent.pywsgi import WSGIServer
 
 import youtube_dl
 
-version_string = " * HomePage, v0.1.0\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+version_string = " * HomePage, v0.2.5\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
 
 # Get the environment paths
 storage_folder = environ.get("HOMEPAGE_STORAGE")
@@ -242,7 +242,7 @@ def main():
 
     # Install the apt dependencies.
     if parser.is_present("-i"):
-        call("sudo apt update && sudo apt install ffmpeg lame atomicparsley faac libav-tools -y",  # noqa: S607
+        call("sudo apt update && sudo apt install ffmpeg lame atomicparsley faac -y",  # noqa: S607
               shell=True)  # noqa: S602
 
     # Run the app
