@@ -270,24 +270,13 @@
       mdcSnackBar.open();
     }
 
-    const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
-      const byteCharacters = window.atob(b64Data);
-      const byteArrays = [];
-
-      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        const byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
-      }
-
-      const blob = new Blob(byteArrays, {type: contentType});
-      return blob;
+    function getPreviousTrack(trackPath){
+      let a = document.createElement('a');
+      a.href = trackPath;
+      a.download = trackPath.split('/').pop();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
     function sendDownloadRequest() {
@@ -299,7 +288,6 @@
         document.getElementById("checkbox-control").style.display = "none";
         document.getElementById("checkbox-form-field").style.display = "none";
         var XHR = new XMLHttpRequest();
-        XHR.responseType = 'json';
         var FD  = new FormData();
         FD.append("videoURL", downloadTextField.value);
 
@@ -316,16 +304,8 @@
         }
         XHR.onreadystatechange = function(evt) {
           if (XHR.readyState == 4 && XHR.status == 200) {
-            var blob = b64toBlob(evt.target.response["file_contents"], evt.target.response["format"]);
-            let downloadElement = document.createElement("a");
-            downloadElement.style = "display: none";
-            document.body.appendChild(downloadElement);
-            let url = window.URL.createObjectURL(blob);
-            downloadElement.href = url;
-            downloadElement.download = evt.target.response["file_name"];
-            downloadElement.click();
-            window.URL.revokeObjectURL(url);
-            window.location.reload();
+            getPreviousTrack(evt.target.responseText);
+            window.location.reload(false);
 
           } else if (XHR.readyState == 4 && XHR.status >= 300) {
             mdcSnackBar.listen("MDCSnackbar:closing", function() {
@@ -333,7 +313,7 @@
             });
             displayMDCSnackbar("Encountered an error, refresh the page and try again.", "Refresh", function(){window.location.reload(false);}, 10000);
           }
-        }
+        };
         XHR.open('POST', './');
         XHR.send(FD);
       } else {
@@ -353,15 +333,6 @@
       </div>
     </div>
     `;
-
-    function getPreviousTrack(trackPath){
-      let a = document.createElement('a')
-      a.href = trackPath
-      a.download = trackPath.split('/').pop()
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-    }
 
     {{ extra_js|safe }}
 
