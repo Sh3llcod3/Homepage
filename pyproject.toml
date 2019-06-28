@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "HomePage"
-version = "0.1.0"
+version = "0.2.0"
 description = "A simple Flask app that allows you to download videos using youtube_dl at home."
 authors = ["Yudhajit N <28938427+Sh3llcod3@users.noreply.github.com>"]
 license = "MIT"

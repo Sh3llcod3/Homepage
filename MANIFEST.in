@@ -1,0 +1,2 @@
+include homepage/static/*
+include homepage/templates/*
