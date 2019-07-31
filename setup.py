@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="homepage",
-    version="0.2.5",
+    version="0.2.6",
     author="Sh3llcod3",
     author_email="no-reply@gmail.co.uk",
     description="A simple flask webapp to download the audio track from almost any internet video.",
@@ -17,7 +17,6 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: POSIX :: Linux",
         "Topic :: Multimedia :: Sound/Audio",
         "Framework :: Flask",
         "Environment :: Web Environment",

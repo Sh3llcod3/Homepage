@@ -1,27 +1,29 @@
 [tool.poetry]
 name = "HomePage"
-version = "0.2.5"
+version = "0.2.6"
 description = "A simple Flask app that allows you to download videos using youtube_dl at home."
 authors = ["Yudhajit N <28938427+Sh3llcod3@users.noreply.github.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "3.7.3"
-Flask = "^1.0"
-youtube_dl = "^2019.6"
-easyparse = "^1.0"
-gevent = "^1.4"
+python = "3.7.4"
+Flask = "*"
+youtube_dl = "*"
+easyparse = "*"
+gevent = "*"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.7"
-flake8-bandit = "^2.1"
-flake8-bugbear = "^19.3"
-flake8-import-order = "^0.18.1"
-flake8-string-format = "^0.2.3"
-flake8-tidy-imports = "^2.0"
-flake8-todo = "^0.7.0"
-setuptools = "^41.0"
-twine = "^1.13"
+flake8 = "*"
+flake8-bandit = "*"
+flake8-bugbear = "*"
+flake8-import-order = "*"
+flake8-string-format = "*"
+flake8-tidy-imports = "*"
+flake8-todo = "*"
+setuptools = "*"
+twine = "*"
+pyinstaller = "*"
+Cython = "*"
 
 [tool.poetry.scripts]
 flaskapp = "homepage:main"

@@ -45,13 +45,13 @@ $ pyenv install 3.7.3
 $ pyenv local 3.7.3
 $ poetry self:update --preview || poetry self update --preview
 $ poetry update
-$ poetry install
+$ poetry install # Add --no-dev if you don't want to tweak.
 $ poetry shell
 $ homepage -ip
 $ homepage -df
 ```
 
-After installing `pyenv`, the lines you add to your `~/.bashrc` may need to be different, please see the [FAQ](#faq-&-troubleshooting).
+After installing `pyenv`, the lines you add to your `~/.bashrc` may need to be different, please see the [FAQ](#faq--troubleshooting).
 
 ## Usage
 
@@ -114,11 +114,34 @@ Whether you want to use it or not is up to you, but I assumed that people prefer
 convenience, so I should probably upload this where more people may be able to take
 advantage of this.
 
+#### Why is it not working?
+
+Your version of `youtube_dl` may be out of date. Having a version of `youtube_dl`
+that is even one version old can mean your tracks may fail to download. Fortunately,
+the library is updated frequently and you can pull in the updates very easily.
+
+If you're using it from PyPi, then:
+```shell
+$ python3 -m pip install --upgrade youtube_dl gevent Flask --user
+```
+
+If you're using it from the `env`, then simply `cd` to the directory you installed it
+and run:
+```shell
+$ poetry update
+$ poetry shell
+```
+
 #### Does HomePage scale?
 
 No. It was never intended to scale in the first place. Neither is it secure in any way.
 Therefore, I should stress that you should __NOT__ deploy this to anywhere except your
 private/internal network.
+
+#### Does it have Windows support?
+
+No. However I am planning to release compiled executables for both Windows and Linux so
+stay tuned for that, if you're interested.
 
 #### Why does it take a long time?
 
@@ -141,3 +164,5 @@ if you have any tips, please create an issue and I'll check it out as soon as po
 - [ ] Save user preferences using cookies.
 - [ ] Display past tracks only for that host.
 - [ ] Add a separate page for management.
+- [ ] Create a system to auto-update `youtube_dl`
+- [ ] Make it work on windows and generate executables

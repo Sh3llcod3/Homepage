@@ -3,9 +3,12 @@
 # Import required modules
 from __future__ import unicode_literals
 
+import platform
+import tempfile
 from atexit import register
 from datetime import datetime
-from os import environ, makedirs, path, walk
+from os import environ, makedirs, path, remove, walk
+from pathlib import Path as FilePath
 from shutil import make_archive
 from subprocess import call, check_output  # noqa: S404
 from sys import argv, exit
@@ -18,17 +21,12 @@ from gevent.pywsgi import WSGIServer
 
 import youtube_dl
 
-version_string = " * HomePage, v0.2.5\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+version_string = " * HomePage, v0.2.6\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+IS_WINDOWS = (platform.system == "Windows")
 
 # Get the environment paths
-storage_folder = environ.get("HOMEPAGE_STORAGE")
-downloads_folder = environ.get("HOMEPAGE_DOWNLOADS")
-
-storage_folder = storage_folder if (storage_folder is not None) else "~/.homepage_storage"
-downloads_folder = downloads_folder if (downloads_folder is not None) else "~/.homepage_downloads"
-
-storage_folder = path.expanduser(storage_folder)
-downloads_folder = path.expanduser(downloads_folder)
+storage_folder = environ.get("HOMEPAGE_STORAGE", path.expanduser(FilePath("~/.homepage_storage")))
+downloads_folder = environ.get("HOMEPAGE_DOWNLOADS", path.expanduser(FilePath("~/.homepage_downloads")))
 
 
 # Setup our youtube_dl logger class.
@@ -52,8 +50,9 @@ def ytdl_hook(progress):
 class Video():
 
     # Initialise the class.
-    def __init__(self, post_request):
+    def __init__(self, post_request, temp_download_dir):
         self.post_request = post_request
+        self.temp_download_dir = temp_download_dir
         self.video_link = post_request["videoURL"]
         self.mime_type = post_request["format_preference"]
         self.ydl_opts = {
@@ -65,7 +64,7 @@ class Video():
             }],
             'logger': YTDLLogger(),
             'progress_hooks': [ytdl_hook],
-            'outtmpl': f'{downloads_folder}/%(title)s.%(ext)s'
+            'outtmpl': f'{temp_download_dir}/%(title)s.%(ext)s'
         }
         if post_request["attach_thumb"].lower() == "yes":
             self.ydl_opts["writethumbnail"] = True
@@ -82,7 +81,7 @@ class Video():
 
     # Add our send_files() method to handle transfer.
     def send_files(self):
-        path, dirs, files = next(walk(downloads_folder))
+        path, dirs, files = next(walk(self.temp_download_dir))
         file_count = len(files)
         self.final_file_name = str()
         self.final_file_location = str()
@@ -95,17 +94,17 @@ class Video():
         if file_count > 1:
             self.final_file_name = "tracks_" + str(datetime.now().timestamp()).replace('.', '')
             self.final_file_location = "/tmp/" + self.final_file_name  # noqa: S108
-            make_archive(self.final_file_location, 'zip', downloads_folder)
+            make_archive(self.final_file_location, 'zip', self.temp_download_dir)
             self.final_file_name += ".zip"
             self.final_file_location += ".zip"
             self.mime_type = "application/zip"
             call(f"mv {self.final_file_location} {storage_folder}/", shell=True)  # noqa: S607, S602
-            call(f"rm {downloads_folder}/*", shell=True)  # noqa: S607, S602
+            call(f"rm {self.temp_download_dir}/*", shell=True)  # noqa: S607, S602
 
         # We only have one track, so let's send the file back.
         else:
-            self.final_file_name = next(walk(downloads_folder))[2][0]
-            call(f"mv {downloads_folder}/* {storage_folder}/", shell=True)  # noqa: S607, S602
+            self.final_file_name = next(walk(self.temp_download_dir))[2][0]
+            call(f"mv {self.temp_download_dir}/* {storage_folder}/", shell=True)  # noqa: S607, S602
 
         return safe_join("./transfer/", self.final_file_name)
 
@@ -140,9 +139,10 @@ def index_page():
         return render_template("./site.html", previous_items=table_items, extra_js=js_addition)
 
     if request.method == "POST":
-        dl_request = Video(request.form)
-        dl_request.download()
-        return dl_request.send_files()
+        with tempfile.TemporaryDirectory() as temp_dirpath:
+            dl_request = Video(request.form, temp_download_dir=temp_dirpath)
+            dl_request.download()
+            return dl_request.send_files()
 
 
 @app.route('/transfer/<filepath>', methods=["GET"])
@@ -158,7 +158,11 @@ def update_file_state():
 def main():
 
     # Setup our argument parser
-    parser = easyparse.opt_parser(argv)
+    if IS_WINDOWS:
+        parser = easyparse.opt_parser(argv, show_colors=False)
+    else:
+        parser = easyparse.opt_parser(argv)
+
     parser.add_comment("Deploy for the first time: homepage -fdip")
     parser.add_comment("Deploy the app normally: homepage -df")
     parser.add_comment("I am aware it complains about using a WSGI server.")
@@ -238,7 +242,9 @@ def main():
     # Delete the previous downloaded tracks
     if parser.is_present("-p"):
         print(" * Purging downloaded tracks.")
-        call(f"rm {downloads_folder}/* {storage_folder}/* 2>/dev/null", shell=True)  # noqa: S602, S607
+        for _ in next(walk(storage_folder))[2]:
+            remove(f"{storage_folder}/{_}")
+        # call(f"rm {storage_folder}/* 2>/dev/null", shell=True)  # noqa: S602, S607
 
     # Install the apt dependencies.
     if parser.is_present("-i"):
@@ -251,9 +257,6 @@ def main():
         # Create required directories if not present.
         if not path.isdir(storage_folder):
             makedirs(storage_folder)
-
-        if not path.isdir(downloads_folder):
-            makedirs(downloads_folder)
 
         local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
                                  "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
