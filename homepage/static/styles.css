@@ -1,8 +1,12 @@
+:root {
+  --mdc-theme-primary: #0d2332;
+}
 :focus {
   outline: none !important;
 }
 html {
   scroll-behavior: smooth;
+  height: 100%;
 }
 body {
   background-color: #f5f5f5;
@@ -37,7 +41,9 @@ html, body {
   }
 }
 .card-body-text {
-  padding: 0 1rem 8px;
+  padding: 1rem;
+  height: 100% !important;
+  font-size: 18px !important;
   color: rgba(0,0,0,.54);
 }
 .card-title-text {
@@ -52,92 +58,11 @@ html, body {
 .fixed-size-background-img {
   height: 250px;
 }
-.otw-card-background {
-  background: url("../Image_Assets/Resources_Tab/otw_card_image2.jpg") #000000 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.replit-card-background {
-  background: url("../Image_Assets/Resources_Tab/replit_card_image.png") #0d2332 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.smashthestack-card-background {
-  background: url("../Image_Assets/Resources_Tab/STS_card_image.png") #000000 center/cover no-repeat;
-  background-size: 140% auto;
-}
-.cybrary-card-background {
-  background: url("../Image_Assets/Resources_Tab/Cybrary_card_image.png") #0d2332 center/cover no-repeat;
-}
-.udacity-card-background {
-  background: url("../Image_Assets/Resources_Tab/udacity_card_image.png") #0d2332 center/cover no-repeat;
-}
-.codewars-card-background {
-  background: url("../Image_Assets/Resources_Tab/codewars_resource_card_image.png") #282828 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.codecademy-card-background {
-  background: url("../Image_Assets/Resources_Tab/codecademy_card_image.png") #0d2332 center/cover no-repeat;
-}
-.reeeeeee-card-background {
-  background: url("../Image_Assets/Resources_Tab/reeeeee_card_image.png") #b1361e center/cover no-repeat;
-  background-size: 104%;
-}
-.cyberchallenge-card-background {
-  background: url("../Image_Assets/Resources_Tab/cyberchallenge_card_image.jpg") #0d2332 center/cover no-repeat;
-}
-.picoctf-card-background {
-  background: url("../Image_Assets/Resources_Tab/picoctf_card_image.png") #0d2332 center/cover no-repeat;
-}
-.endorsement-card-background {
-  background: url("../Image_Assets/Resources_Tab/endorsement_card_image.png") #0d2332 center/cover no-repeat;
-}
-.hak5-card-background {
-  background: url("../Image_Assets/Resources_Tab/hak5_card_image.png") #9e9e9e center/cover no-repeat;
-  background-size: 100%;
-}
-.futurelearn-card-background {
-  background: url("../Image_Assets/Resources_Tab/futurelearn_card_image.png") #0d2332 center/cover no-repeat;
-}
-.homepage_welcome_card {
-  background: url('../Image_Assets/Home_Tab/home_card_image.png') #0d2332 center / cover no-repeat;
-  height: 100%;
-  max-height: 400px;
-  background-size: auto 100%;
-}
-.cdsurvivalguide_home_card {
-  background: url('../Image_Assets/Home_Tab/alice_asset_survival_guide.png') #4a3c5f center / cover no-repeat !important;
-}
-.hmg_programme_home_card {
-  background: url('../Image_Assets/Home_Tab/CD_Home_Resources.png') #0d2332 center / cover no-repeat;
-  max-height: 250px;
-}
-.home_discord_invite_card {
-  background: url("../Image_Assets/Home_Tab/discord_logo_home_card_image.svg") #2C2F33 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.home_assess_card_reminder {
-  background: url("../Image_Assets/elite_alt_card.png") #0d2332 center/cover no-repeat;
-}
-.medium_blog_main_card_image {
-  background: url("../Image_Assets/Home_Tab/medium_blog_card_image.png") #9f5335 center/cover no-repeat;
-}
 .custom_padded_font_card_home {
   padding: 0 1rem 8px;
   height: 100% !important;
   font-size: 18px !important;
   color: rgba(0,0,0,.54);
-}
-.hmg_programme_body_text {
-  padding: 1rem 1rem 8px;
-  height: auto;
-  font-size: 18px !important;
-  color: rgba(0,0,0,.54);
-  overflow: auto;
-}
-.home_tab_welcome_banner_image {
-  background: url('../Image_Assets/Home_Tab/home_card_image.png') #0d2332 center / cover no-repeat;
-  margin-top: auto;
-  margin-bottom: auto;
-  height: 100%
 }
 .override_textfield_bottom_padding {
   padding-bottom: 20px !important;
@@ -166,6 +91,8 @@ html, body {
 }
 .mdc-typography--body1 {
   height: inherit !important;
+  background-color: #f5f5f5;
+  border-radius: 8px !important;
 }
 .mdc-image-list__image {
   border-radius: 24px;
@@ -184,13 +111,6 @@ html, body {
 .project_card_fixed_background {
   height: 250px !important;
 }
-.cdbotmain_card_image {
-  background: url('../Image_Assets/Discord_Tab/discord_card_main.png') #e8e4e7 center/cover no-repeat;
-}
-.cdmathsbot_card_image {
-  background: url('../Image_Assets/Discord_Tab/mathsbot_card_image.svg') #7289da center/cover no-repeat;
-  background-size: 90%
-}
 .project_card_menu_icons {
   vertical-align: bottom;
   padding-right: 5px;
@@ -204,16 +124,6 @@ html, body {
   transition: all .12s ease-out;
   top: -4px;
 }
-.hibp_project_card_image {
-  background: url('../Image_Assets/HIBP_Logo_Background.png') #c76a6a center / cover no-repeat;
-}
-.hibp_search_card_image {
-  background: url('../Image_Assets/HIBP_Logo_Background.png') #c76a6a center / cover no-repeat;
-}
-.xkcd_card_fetch_image {
-  background: url('../Image_Assets/Discord_Tab/Bot_XKCD_Fetcher.png') #36393f center / cover no-repeat;
-  background-size: 100%;
-}
 .mdc-text-field--focused:not(.mdc-text-field--disabled) .mdc-floating-label {
   color: #0d2332;
 }
@@ -226,17 +136,10 @@ html, body {
 }
 .textfield_span_width_full {
   width: 100%;
+  margin-right: 5px;
 }
 .mdc-text-field::before, .mdc-text-field::after {
   width: auto !important;
-}
-.discord_bot_quote_card_image {
-  background: url('../Image_Assets/Discord_Tab/Discord_Quote_Image_Card.png') #36393f center/cover no-repeat;
-  background-size: 100%;
-}
-.discord_api_docs_card_image {
-  background: url('../Image_Assets/Discord_Tab/discord_api_docs_card_image.png') #36393e center/cover no-repeat;
-  background-size: 100% auto;
 }
 .rounded_corner_list_item {
   border-radius: 15px !important;
@@ -270,48 +173,6 @@ html, body {
 .form_padding_adjustments {
   padding-bottom: 5px;
   padding-left: 3px;
-}
-.cdapp_main_card_image {
-  background: url('../Image_Assets/App_Tab/app_card_main_img.png') #ef1580 center/cover no-repeat;
-  background-size: auto 110%;
-}
-.App_Contrib_Flutter_Docs {
-  background: url("../Image_Assets/App_Tab/Contribute_Programming.gif") #283247 center/cover no-repeat;
-}
-.cdsurvivalguide_site_card_image {
-  background: url("../Image_Assets/Websites_Tab/cdsurvivial_guide_card_image.png") #106668 center/cover no-repeat;
-}
-.challenge_master_site_card_image {
-  background: url("../Image_Assets/Js_Logo_Background.png") #ffab00 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.app_website_site_card_image {
-    background: url("../Image_Assets/Firebase_Logo_Background.png") #039be5 center/cover no-repeat;
-    background-size: 130% auto;
-}
-.discord_bot_assess_card_image {
-  background: url("../Image_Assets/Discord_Tab/bot_get_game_level_no_hint_owo.jpg") #363940 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.discord_dwouca_owo_gang_lmao {
-  background: url("../Image_Assets/Discord_Tab/owo_gang_dwouca.jpg") #363940 center/cover no-repeat;
-  background-size: 100% auto;
-}
-.website_tab_help_us_card_image {
-  background: url("../Image_Assets/Websites_Tab/responsive_design_card_image.gif") #9d9f9e center/cover no-repeat;
-  background-size: 100% auto;
-}
-.cd_site_guide_card_image {
-  background: url("../Image_Assets/Websites_Tab/cd_survivalguide_card_image.jpg") #0f1722 center/cover no-repeat;
-  background-size: 90% auto;
-}
-.app_site_alt_card_image {
-  background: url("../Image_Assets/Websites_Tab/app_website_card_image.jpg") #091b27 center/cover no-repeat;
-  background-size: 85% auto;
-}
-.alexa_skill_card_image {
-  background: url("../Image_Assets/Websites_Tab/cd_alexa_skill_card_image.png") #ffffff center/cover no-repeat;
-  background-size: 100% auto;
 }
 .resources-tab-card {
   height: 100% !important;
@@ -440,50 +301,8 @@ html, body {
   color: var(--mdc-theme-text-secondary-on-background, rgba(0,0,0,.54));
   height: inherit;
 }
-.placeholder-image {
-  background: url('https://cdn.glitch.com/3f2aa87c-0707-4d16-b533-62cb0b69db35%2FDiscord%20Bot%20List%20Icon%20-%20Large%202.png?1543200818856') #37373d center/cover no-repeat;
-  background-size: auto 100%;
-}
 .events-body-padded {
   padding-bottom: 12px;
-}
-.events-elite-card {
-  background: url('../Image_Assets/cd_elite_bg.png') #0d2332 center/cover no-repeat;
-  background-size: auto 112%;
-}
-.events-cft-card {
-  background: url('../Image_Assets/Home_Tab/Cyber_FastTrack.png') #0d2332 center/cover no-repeat;
-  background-size: auto 110%;
-}
-.events-ggcs-card {
-  background: url('../Image_Assets/Home_Tab/ggcs.png') #0d2332 center/cover no-repeat;
-  background-size: auto 110%;
-}
-.events-prereg-card {
-  background: url('../Image_Assets/daniel-josef-540635-unsplash.jpg') #780036 center/cover no-repeat;
-}
-.events-assess-card {
-  background: url('../Image_Assets/assess_events_card.png') #0d2332 center/cover no-repeat;
-  background-size: auto 100%;
-}
-.events-game-card {
-  background: url('../Image_Assets/cs_game_event.png') #0d2332 center/cover no-repeat;
-  background-size: auto 100%;
-}
-.events-essentials-card {
-  background: url('../Image_Assets/essentials_event_card.jpg') #0d2332 center/cover no-repeat;
-  background-size: auto 100%;
-}
-.cd_richpresence_card {
-  background: url('../Image_Assets/discord_rich_presence.png') #778ff1 center/cover no-repeat;
-  background-size: auto 100%;
-}
-.alexa_skill_card_project {
-  background: url('../Image_Assets/alexa_skill_card.png') #232F3E center/cover no-repeat;
-  background-size: auto 130%;
-}
-.main-page-card-home {
-  background: url('../Image_Assets/cd_main_card.png') #0d2332 center/cover no-repeat;
 }
 .leading-notch-textfield {
   border-radius: 8px 0 0 8px !important;
@@ -586,4 +405,112 @@ html, body {
 }
 .red-events-text {
   color: #c04b4e !important;
+}
+.mdc-snackbar__action::before, .mdc-snackbar__action::after {
+	background-color: rgba(255, 255, 255, 0.87);
+}
+.mdc-snackbar__action:not(:disabled) {
+	color: rgba(255, 255, 255, 0.87) !important;
+}
+.mdc-drawer .mdc-list-item--activated .mdc-list-item__graphic {
+	color: var(--mdc-theme-primary, #0d2332);
+}
+.mdc-drawer .mdc-list-item--activated {
+	color: var(--mdc-theme-primary, #0d2332);
+}
+.mdc-tab--active .mdc-tab__icon {
+	color: var(--mdc-theme-primary, #0d2332);
+}
+.mdc-tab--active .mdc-tab__text-label {
+	color: var(--mdc-theme-primary, #0d2332);
+}
+.mdc-fab {
+	background-color: var(--mdc-theme-primary, #0d2332);
+}
+.mdc-dialog__content pre {
+  background-color: #f6f8fa;
+}
+:not(pre) > code {
+  background-color: rgba(27,31,35,.05);
+}
+.light-dark-text {
+  color: rgba(255,255,255,.85) !important;
+}
+.colored-card-bg {
+  background-color: #0d2332;
+}
+.blurred_bg {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  right: 0;
+  left: 0;
+  margin: 0;
+  border: 0;
+  filter: blur(5px);
+  transform: scale(1.1);
+  display: block;
+  background: url("./Background.jpg") #f5f5f5 center/cover no-repeat;
+}
+.main_page_body {
+  position: relative;
+}
+.mdc-card {
+  width: auto;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+.mdc-card:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.mdc-list {
+  width: auto;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  background-color: #f5f5f5;
+}
+.mdc-list:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.mdc-list-item__graphic {
+  margin-left: 0;
+  margin-right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.mdc-list-item__meta {
+  color: #0d2332;
+  cursor: pointer;
+}
+.mdc-layout-grid__inner {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.mdc-layout-grid {
+  max-width: 950px;
+}
+.page-form {
+  padding: 0;
+  margin: 0;
+  width: 100% !important;
+}
+.mdc-form-field > label {
+  color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));
+}
+.mdc-linear-progress {
+  margin-bottom: 5px;
+}
+#Previous-Track-Table {
+  display: none;
+}
+#site-menu-anchor {
+  display: inline;
 }

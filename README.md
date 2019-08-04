@@ -41,8 +41,8 @@ Once you've installed those, we just to install a few more things.
 ```bash
 $ git clone https://github.com/Sh3llcod3/HomePage.git
 $ cd HomePage/
-$ pyenv install 3.7.3
-$ pyenv local 3.7.3
+$ pyenv install 3.7.4
+$ pyenv local 3.7.4
 $ poetry self:update --preview || poetry self update --preview
 $ poetry update
 $ poetry install # Add --no-dev if you don't want to tweak.
@@ -91,7 +91,7 @@ fi
 You absolutely can. To change the background, change out `homepage/static/Background.jpg` with any image you like,
 but it has to be called `Background.jpg` and in the `JPEG` format. I will make this process easier in the future.
 
-#### Pyenv fails to install 3.7.3
+#### Pyenv fails to install 3.7.4
 
 You may have forgotten to install some crucial `pyenv` dependencies from `apt`.
 Go ahead and install the packages below. If you're using other package managers,

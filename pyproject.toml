@@ -24,6 +24,7 @@ setuptools = "*"
 twine = "*"
 pyinstaller = "*"
 Cython = "*"
+requests = "*"
 
 [tool.poetry.scripts]
 flaskapp = "homepage:main"

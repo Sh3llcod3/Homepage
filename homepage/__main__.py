@@ -1,4 +1,4 @@
-from .homepage import *
+from .homepage import main
 
 
 if __name__ == '__main__':

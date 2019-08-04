@@ -9,7 +9,7 @@ from atexit import register
 from datetime import datetime
 from os import environ, makedirs, path, remove, walk
 from pathlib import Path as FilePath
-from shutil import make_archive
+from shutil import make_archive, move as move_file
 from subprocess import call, check_output  # noqa: S404
 from sys import argv, exit
 
@@ -21,12 +21,14 @@ from gevent.pywsgi import WSGIServer
 
 import youtube_dl
 
-version_string = " * HomePage, v0.2.6\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
-IS_WINDOWS = (platform.system == "Windows")
+VERSION_STRING = " * HomePage, v0.2.6\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+IS_WINDOWS = (platform.system().lower() == "windows")
+WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
+REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
+LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
 
 # Get the environment paths
-storage_folder = environ.get("HOMEPAGE_STORAGE", path.expanduser(FilePath("~/.homepage_storage")))
-downloads_folder = environ.get("HOMEPAGE_DOWNLOADS", path.expanduser(FilePath("~/.homepage_downloads")))
+STORAGE_FOLDER = FilePath(environ.get("HOMEPAGE_STORAGE", path.expanduser("~/.homepage_storage")))
 
 
 # Setup our youtube_dl logger class.
@@ -43,7 +45,8 @@ class YTDLLogger():
 
 def ytdl_hook(progress):
     if progress['status'] == 'finished':
-        print(' * Downloaded video, now converting...')
+        if bool(LOG_DOWNLOAD):
+            print(' * Downloaded video, now converting...')
 
 
 # Setup our Video class, this will handle the youtube_dl side of things.
@@ -57,11 +60,16 @@ class Video():
         self.mime_type = post_request["format_preference"]
         self.ydl_opts = {
             'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': f'{self.mime_type}',
-                'preferredquality': post_request["quality_preference"],
-            }],
+            'postprocessors': [
+                {
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': f'{self.mime_type}',
+                    'preferredquality': post_request["quality_preference"],
+                },
+                {
+                    'key': 'FFmpegMetadata',
+                }
+            ],
             'logger': YTDLLogger(),
             'progress_hooks': [ytdl_hook],
             'outtmpl': f'{temp_download_dir}/%(title)s.%(ext)s'
@@ -84,7 +92,6 @@ class Video():
         path, dirs, files = next(walk(self.temp_download_dir))
         file_count = len(files)
         self.final_file_name = str()
-        self.final_file_location = str()
 
         # The link is invalid
         if file_count == 0:
@@ -93,18 +100,17 @@ class Video():
         # We have more than one file, so let's zip them up and send them back.
         if file_count > 1:
             self.final_file_name = "tracks_" + str(datetime.now().timestamp()).replace('.', '')
-            self.final_file_location = "/tmp/" + self.final_file_name  # noqa: S108
-            make_archive(self.final_file_location, 'zip', self.temp_download_dir)
-            self.final_file_name += ".zip"
-            self.final_file_location += ".zip"
+            self.final_file_location = FilePath("/tmp/")  # noqa: S108
+            make_archive(self.final_file_location / self.final_file_name, 'zip', self.temp_download_dir)
+            self.final_file_location /= (self.final_file_name + ".zip")
             self.mime_type = "application/zip"
-            call(f"mv {self.final_file_location} {storage_folder}/", shell=True)  # noqa: S607, S602
-            call(f"rm {self.temp_download_dir}/*", shell=True)  # noqa: S607, S602
+            move_file(str(self.final_file_location), STORAGE_FOLDER)
+            self.final_file_name += ".zip"
 
         # We only have one track, so let's send the file back.
         else:
             self.final_file_name = next(walk(self.temp_download_dir))[2][0]
-            call(f"mv {self.temp_download_dir}/* {storage_folder}/", shell=True)  # noqa: S607, S602
+            move_file(safe_join(self.temp_download_dir, self.final_file_name), STORAGE_FOLDER)
 
         return safe_join("./transfer/", self.final_file_name)
 
@@ -117,7 +123,7 @@ list_item_template = """<li class="mdc-list-item">
 
 # Generate the html elements for the previous files.
 def update_file_list():
-    path, dirs, files = next(walk(storage_folder))
+    path, dirs, files = next(walk(STORAGE_FOLDER))
     prev_count = len(files)
     if prev_count == 0:
         return ["", ""]
@@ -147,7 +153,7 @@ def index_page():
 
 @app.route('/transfer/<filepath>', methods=["GET"])
 def download_file(filepath):
-    return send_from_directory(storage_folder, filepath, as_attachment=True)
+    return send_from_directory(STORAGE_FOLDER, filepath, as_attachment=True)
 
 
 @app.route('/update_state', methods=["GET"])
@@ -165,7 +171,6 @@ def main():
 
     parser.add_comment("Deploy for the first time: homepage -fdip")
     parser.add_comment("Deploy the app normally: homepage -df")
-    parser.add_comment("I am aware it complains about using a WSGI server.")
     parser.add_comment("This app isn't designed to scale at all, on purpose.")
     parser.add_comment("Please don't deploy this outside your internal network.")
     parser.add_arg(
@@ -186,14 +191,14 @@ def main():
         "-d",
         "--deploy-app",
         None,
-        "Deploy the app and start the flask server.",
+        "Deploy the app and start the WSGI server.",
         optional=False
     )
     parser.add_arg(
         "-f",
         "--forward-to-all-hosts",
         None,
-        "Add an iptables rule forwarding port 80 to 5000 for convenience.",
+        "Add an iptables rule forwarding port 80 to WSGI server port for convenience.",
         optional=False
     )
     parser.add_arg(
@@ -220,54 +225,58 @@ def main():
 
     # Print the version.
     if parser.is_present("-v"):
-        print(version_string)
+        print(VERSION_STRING)
         exit()
 
     # Add the iptables rule
-    active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
-                                     shell=True).decode('utf-8')  # noqa: S602
-    active_interface = active_interface.rstrip()
+    if not IS_WINDOWS:
+        active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
+                                         shell=True).decode('utf-8').rstrip()  # noqa: S602
 
     def remove_rule():
         print("\n * Reverting iptables rule.")
         call((f"sudo iptables -t nat -D PREROUTING -i {active_interface} "  # noqa: S607
-              "-p tcp --dport 80 -j REDIRECT --to-port 5000"), shell=True)  # noqa: S602
+              f"-p tcp --dport 80 -j REDIRECT --to-port {WSGI_PORT}"), shell=True)  # noqa: S602
 
     if parser.is_present("-f"):
-        print(" * Adding iptables rule.")
-        call((f"sudo iptables -t nat -A PREROUTING -i {active_interface} "  # noqa: S607
-              "-p tcp --dport 80 -j REDIRECT --to-port 5000"), shell=True)  # noqa: S602
-        register(remove_rule)
+        if not IS_WINDOWS:
+            print(" * Adding iptables rule.")
+            call((f"sudo iptables -t nat -A PREROUTING -i {active_interface} "  # noqa: S607
+                  f"-p tcp --dport 80 -j REDIRECT --to-port {WSGI_PORT}"), shell=True)  # noqa: S602
+            register(remove_rule)
+        else:
+            print(" * Skipping iptables rule since host is Windows.")
 
     # Delete the previous downloaded tracks
     if parser.is_present("-p"):
         print(" * Purging downloaded tracks.")
-        for _ in next(walk(storage_folder))[2]:
-            remove(f"{storage_folder}/{_}")
-        # call(f"rm {storage_folder}/* 2>/dev/null", shell=True)  # noqa: S602, S607
+        for cached_item in next(walk(STORAGE_FOLDER))[2]:
+            remove(STORAGE_FOLDER / cached_item)
 
     # Install the apt dependencies.
     if parser.is_present("-i"):
-        call("sudo apt update && sudo apt install ffmpeg lame atomicparsley faac -y",  # noqa: S607
-              shell=True)  # noqa: S602
+        if not IS_WINDOWS:
+            call("sudo apt update && sudo apt install ffmpeg lame atomicparsley faac -y",  # noqa: S607
+                  shell=True)  # noqa: S602
 
     # Run the app
     if parser.is_present("-d"):
 
         # Create required directories if not present.
-        if not path.isdir(storage_folder):
-            makedirs(storage_folder)
+        if not path.isdir(STORAGE_FOLDER):
+            makedirs(STORAGE_FOLDER)
 
-        local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
-                                 "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
-        print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}")
-        print(f" * My default interface is: {active_interface}")
+        if not IS_WINDOWS:
+            local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
+                                     "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
+            print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}")
+            print(f" * My default interface is: {active_interface}")
 
         try:
-            http_server = WSGIServer(('', 5000), app, log=None, error_log='default')
+            http_server = WSGIServer(('', WSGI_PORT), app, log=REQUEST_LOGLEVEL, error_log='default')
             http_server.serve_forever()
         except(KeyboardInterrupt):
-            pass
+            exit()
 
 
 if __name__ == "__main__":
