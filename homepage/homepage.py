@@ -21,7 +21,7 @@ from gevent.pywsgi import WSGIServer
 
 import youtube_dl
 
-VERSION_STRING = " * HomePage, v0.2.6\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.2.7\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
 IS_WINDOWS = (platform.system().lower() == "windows")
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
@@ -269,7 +269,7 @@ def main():
         if not IS_WINDOWS:
             local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
                                      "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
-            print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}")
+            print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}:{WSGI_PORT}")
             print(f" * My default interface is: {active_interface}")
 
         try:

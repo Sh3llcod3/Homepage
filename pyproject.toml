@@ -1,9 +1,26 @@
 [tool.poetry]
-name = "HomePage"
-version = "0.2.6"
-description = "A simple Flask app that allows you to download videos using youtube_dl at home."
-authors = ["Yudhajit N <28938427+Sh3llcod3@users.noreply.github.com>"]
+name = "homepage"
+version = "0.2.7"
+description = "A simple flask webapp to download the audio track from almost any internet video."
+authors = ["Sh3llcod3 <28938427+Sh3llcod3@users.noreply.github.com>"]
 license = "MIT"
+readme = 'README.md'
+repository = "https://github.com/Sh3llcod3/HomePage"
+homepage = "https://github.com/Sh3llcod3/HomePage"
+
+classifiers = [
+  "Programming Language :: Python :: 3.6",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Multimedia :: Sound/Audio",
+  "Framework :: Flask",
+  "Environment :: Web Environment"
+]
+
+include = [
+  "homepage/static/*",
+  "homepage/templates/*",
+  "homepage/install_packages.py"
+]
 
 [tool.poetry.dependencies]
 python = "3.7.4"
@@ -25,6 +42,7 @@ twine = "*"
 pyinstaller = "*"
 Cython = "*"
 requests = "*"
+mypy = "*"
 
 [tool.poetry.scripts]
 flaskapp = "homepage:main"
