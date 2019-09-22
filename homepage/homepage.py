@@ -3,7 +3,6 @@
 # Import required modules
 from __future__ import unicode_literals
 
-import platform
 import tempfile
 from atexit import register
 from datetime import datetime
@@ -21,8 +20,9 @@ from gevent.pywsgi import WSGIServer
 
 import youtube_dl
 
+from .install_packages import OSInteractionLayer
+
 VERSION_STRING = " * HomePage, v0.2.7\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
-IS_WINDOWS = (platform.system().lower() == "windows")
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -163,8 +163,11 @@ def update_file_state():
 
 def main():
 
+    # Setup our required packages
+    PKG_MGR = OSInteractionLayer()
+
     # Setup our argument parser
-    if IS_WINDOWS:
+    if PKG_MGR.IS_WINDOWS:
         parser = easyparse.opt_parser(argv, show_colors=False)
     else:
         parser = easyparse.opt_parser(argv)
@@ -215,6 +218,13 @@ def main():
         "Install some apt dependencies, only need to run once.",
         optional=False
     )
+    parser.add_arg(
+        "-s",
+        "--server-mode",
+        None,
+        "Treat node as tty only, compile FFMPEG from source.",
+        optional=True
+    )
     parser.parse_args()
 
     # View the help screen
@@ -229,7 +239,7 @@ def main():
         exit()
 
     # Add the iptables rule
-    if not IS_WINDOWS:
+    if not PKG_MGR.IS_WINDOWS:
         active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
                                          shell=True).decode('utf-8').rstrip()  # noqa: S602
 
@@ -239,7 +249,7 @@ def main():
               f"-p tcp --dport 80 -j REDIRECT --to-port {WSGI_PORT}"), shell=True)  # noqa: S602
 
     if parser.is_present("-f"):
-        if not IS_WINDOWS:
+        if not PKG_MGR.IS_WINDOWS:
             print(" * Adding iptables rule.")
             call((f"sudo iptables -t nat -A PREROUTING -i {active_interface} "  # noqa: S607
                   f"-p tcp --dport 80 -j REDIRECT --to-port {WSGI_PORT}"), shell=True)  # noqa: S602
@@ -253,11 +263,21 @@ def main():
         for cached_item in next(walk(STORAGE_FOLDER))[2]:
             remove(STORAGE_FOLDER / cached_item)
 
-    # Install the apt dependencies.
+    # Install the package dependencies.
     if parser.is_present("-i"):
-        if not IS_WINDOWS:
-            call("sudo apt update && sudo apt install ffmpeg lame atomicparsley faac -y",  # noqa: S607
-                  shell=True)  # noqa: S602
+
+        # Treat as tty only, don't pull in x-org deps.
+        if parser.is_present("-s"):
+            pass
+
+        # Host is desktop, just install the deps as-is.
+        else:
+            base_pkgs = "ffmpeg lame atomicparsley faac"
+            PKG_MGR.install_packages(
+                apt=["sudo apt update", f"sudo apt -y install {base_pkgs}"],
+                pacman=[f"sudo pacman -S {base_pkgs} --noconfirm"],
+                dnf=["sudo dnf update", f"sudo dnf -y install {base_pkgs}"]
+            )
 
     # Run the app
     if parser.is_present("-d"):
@@ -266,7 +286,7 @@ def main():
         if not path.isdir(STORAGE_FOLDER):
             makedirs(STORAGE_FOLDER)
 
-        if not IS_WINDOWS:
+        if not PKG_MGR.IS_WINDOWS:
             local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
                                      "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
             print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}:{WSGI_PORT}")
