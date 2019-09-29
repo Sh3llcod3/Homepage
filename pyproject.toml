@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "homepage"
-version = "0.2.7"
+version = "0.2.9"
 description = "A simple flask webapp to download the audio track from almost any internet video."
 authors = ["Sh3llcod3 <28938427+Sh3llcod3@users.noreply.github.com>"]
 license = "MIT"
@@ -45,7 +45,7 @@ requests = "*"
 mypy = "*"
 
 [tool.poetry.scripts]
-flaskapp = "homepage:main"
+homepage = "homepage:main"
 
 [build-system]
 requires = ["poetry>=0.12"]

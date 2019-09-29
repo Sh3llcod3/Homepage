@@ -25,7 +25,7 @@ class OSInteractionLayer():
         else:
             return False
 
-    def __is_pkg_mgr_present(self, pkg_mgr_name) -> bool:
+    def is_prog_present(self, pkg_mgr_name: str) -> bool:
         checker_cmd: str = ('/usr/bin/env bash -c '
                             f'"hash {pkg_mgr_name} '
                             '>/dev/null 2>/dev/null '
@@ -44,7 +44,7 @@ class OSInteractionLayer():
 
         try:
             for name, actions in self.package_mapping.items():
-                if self.__is_pkg_mgr_present(name):
+                if self.is_prog_present(name):
                     for pkg_mgr_cmd in actions:
                         check_call(f"{pkg_mgr_cmd}", shell=True)  # noqa: S602
                     else:
@@ -68,3 +68,32 @@ class OSInteractionLayer():
 
         else:
             return self.__install_win_pkg()
+
+    def compile_dist_pkg(self, **dist_mapping) -> bool:
+        """Compile source packages, discriminate based on os-release"""
+
+        try:
+            if self.__get_distro():
+                for rel_actual_name, actions in dist_mapping.items():
+                    if self.OS_RELEASE == rel_actual_name:
+                        for compile_instruction in actions[1:]:
+                            check_call(f"{compile_instruction}", shell=True)  # noqa: S602
+                        else:
+                            return True
+                else:
+                    for actions in dist_mapping.values():
+                        if self.is_prog_present(actions[0]):
+                            print(f"Distro not found, using fallback based on {actions[0]}")
+                            for compile_instruction in actions[1:]:
+                                check_call(f"{compile_instruction}", shell=True)  # noqa: S602
+                            else:
+                                return True
+                    else:
+                        print("Unable to match supported distro or package manager.")
+                        print("Please file an issue with your /etc/os-release file and package manager.")
+                        return False
+
+            return False
+
+        except(CalledProcessError, KeyboardInterrupt):
+            return False

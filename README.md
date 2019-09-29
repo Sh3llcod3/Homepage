@@ -5,25 +5,28 @@ It is intended to be deployed inside a private network for personal use, so that
 and download the tracks they want.
 
 HomePage is very basic, but it has a Material Design front-end which is simple and easy to use.
-HomePage uses `youtube_dl` to download the videos, so quite a few sites are supported.
+HomePage uses `youtube_dl` to download the videos, so quite a few sites are supported. Playlists are also supported.
 
 ![HomePage](homepage/static/HomePage.png)
 
 ## Setup & Prerequsites
 
-- The `apt` package manager
-- `python3.6` or above
+- `python 3.6` or above
 - The `pip` module for the above python version
 - `sudo` access if you wish to use port `80`
-- A Debian based distro. (tested on: Ubuntu 18.04 LTS)
 - `pyenv` installed (optional)
 - `poetry` installed (optional)
 
 The basic installation is very simple.
 
 ```bash
-$ python3 -m pip install homepage
-$ homepage -ip
+$ python3 -m pip install --user homepage
+
+# Normal desktop
+$ homepage -i
+
+# TTY only server
+$ homepage -ic
 ```
 
 Then, you can deploy with:
@@ -93,14 +96,16 @@ but it has to be called `Background.jpg` and in the `JPEG` format. I will make t
 
 #### Pyenv fails to install 3.7.4
 
-You may have forgotten to install some crucial `pyenv` dependencies from `apt`.
-Go ahead and install the packages below. If you're using other package managers,
-`HomePage` won't work, but [here](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) is their wiki page.
+You may have forgotten to install some crucial `pyenv` dependencies.
+If you're using other package managers, check [here](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+for their wiki page. If you're using `apt`, you can simply run:
 
 ```bash
 $ sudo apt update
 $ sudo apt-get install -y --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 ```
+
+Then retry the `pyenv` installation.
 
 #### Why does HomePage exist?
 
@@ -131,6 +136,8 @@ and run:
 $ poetry update
 $ poetry shell
 ```
+
+> You may want to write some sort of `cron` job to do this every few days or so.
 
 #### Does HomePage scale?
 

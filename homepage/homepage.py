@@ -11,6 +11,7 @@ from pathlib import Path as FilePath
 from shutil import make_archive, move as move_file
 from subprocess import call, check_output  # noqa: S404
 from sys import argv, exit
+from typing import List
 
 import easyparse
 
@@ -22,7 +23,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.2.7\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.2.9\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -164,10 +165,10 @@ def update_file_state():
 def main():
 
     # Setup our required packages
-    PKG_MGR = OSInteractionLayer()
+    pkg_mgr = OSInteractionLayer()
 
     # Setup our argument parser
-    if PKG_MGR.IS_WINDOWS:
+    if pkg_mgr.IS_WINDOWS:
         parser = easyparse.opt_parser(argv, show_colors=False)
     else:
         parser = easyparse.opt_parser(argv)
@@ -219,10 +220,10 @@ def main():
         optional=False
     )
     parser.add_arg(
-        "-s",
-        "--server-mode",
+        "-c",
+        "--compile-ffmpeg",
         None,
-        "Treat node as tty only, compile FFMPEG from source.",
+        "Treat node as tty only, compile latest FFMPEG from GitHub.",
         optional=True
     )
     parser.parse_args()
@@ -239,7 +240,7 @@ def main():
         exit()
 
     # Add the iptables rule
-    if not PKG_MGR.IS_WINDOWS:
+    if not pkg_mgr.IS_WINDOWS:
         active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
                                          shell=True).decode('utf-8').rstrip()  # noqa: S602
 
@@ -249,7 +250,7 @@ def main():
               f"-p tcp --dport 80 -j REDIRECT --to-port {WSGI_PORT}"), shell=True)  # noqa: S602
 
     if parser.is_present("-f"):
-        if not PKG_MGR.IS_WINDOWS:
+        if not pkg_mgr.IS_WINDOWS:
             print(" * Adding iptables rule.")
             call((f"sudo iptables -t nat -A PREROUTING -i {active_interface} "  # noqa: S607
                   f"-p tcp --dport 80 -j REDIRECT --to-port {WSGI_PORT}"), shell=True)  # noqa: S602
@@ -260,24 +261,84 @@ def main():
     # Delete the previous downloaded tracks
     if parser.is_present("-p"):
         print(" * Purging downloaded tracks.")
-        for cached_item in next(walk(STORAGE_FOLDER))[2]:
-            remove(STORAGE_FOLDER / cached_item)
+        try:
+            for cached_item in next(walk(STORAGE_FOLDER))[2]:
+                remove(STORAGE_FOLDER / cached_item)
+        except(StopIteration):
+            pass
+
+    # Treat as tty only, don't pull in x-org deps.
+    if parser.is_present("-c"):
+        ffmpeg_install_dir = FilePath(path.expanduser('~/.ffmpeg'))
+
+        deb_pkg_build: List[str] = [
+            "apt",
+            "sudo apt update",
+            ("sudo apt -y install autoconf "
+             "automake "
+             "build-essential "
+             "cmake "
+             "git-core "
+             "libass-dev "
+             "libfreetype6-dev "
+             "libtool "
+             "libvorbis-dev "
+             "pkg-config "
+             "texinfo "
+             "wget "
+             "zlib1g-dev "
+             "nasm "
+             "yasm "
+             "libx264-dev "
+             "libx265-dev "
+             "libnuma-dev "
+             "libvpx-dev "
+             "libfdk-aac-dev "
+             "libmp3lame-dev "
+             "libopus-dev"),
+            f"rm -rf {ffmpeg_install_dir}",
+            f"git clone https://github.com/FFmpeg/FFmpeg.git {ffmpeg_install_dir}",
+            (f'cd {ffmpeg_install_dir} && git pull --all --prune && ./configure '
+             '--pkg-config-flags="--static" '
+             '--extra-libs="-lpthread -lm" '
+             '--enable-gpl '
+             '--enable-libass '
+             '--enable-libfdk-aac '
+             '--enable-libfreetype '
+             '--enable-libmp3lame '
+             '--enable-libopus '
+             '--enable-libvorbis '
+             '--enable-libvpx '
+             '--enable-libx264 '
+             '--enable-libx265 '
+             '--enable-nonfree '
+             ' && make -j`nproc` && '
+             ' ln -sf $(readlink -f ffmpeg) /usr/local/bin/ffmpeg && '
+             ' ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe')
+        ]
+
+        pkg_mgr.compile_dist_pkg(
+            ubuntu=deb_pkg_build,
+            kali=deb_pkg_build,
+            mint=deb_pkg_build,
+            debian=deb_pkg_build,
+            raspbian=deb_pkg_build
+        )
 
     # Install the package dependencies.
     if parser.is_present("-i"):
 
-        # Treat as tty only, don't pull in x-org deps.
-        if parser.is_present("-s"):
-            pass
+        # Host is desktop, just install the deps as-is unless specified.
+        base_pkgs: str = "lame atomicparsley faac "
+        base_pkgs += "ffmpeg" if (not pkg_mgr.is_prog_present("ffmpeg") and not parser.is_present("-c")) else ""
 
-        # Host is desktop, just install the deps as-is.
-        else:
-            base_pkgs = "ffmpeg lame atomicparsley faac"
-            PKG_MGR.install_packages(
-                apt=["sudo apt update", f"sudo apt -y install {base_pkgs}"],
-                pacman=[f"sudo pacman -S {base_pkgs} --noconfirm"],
-                dnf=["sudo dnf update", f"sudo dnf -y install {base_pkgs}"]
-            )
+        pkg_mgr.install_packages(
+            apt=["sudo apt update", f"sudo apt -y install {base_pkgs}"],
+            pacman=[f"sudo pacman --noconfirm -S {base_pkgs}"],
+            dnf=["sudo dnf update", f"sudo dnf -y install {base_pkgs}"],
+            zypper=["zypper update", f"zypper -n install {base_pkgs}"],
+            emerge=[f"NON_INTERACTIVE=1 emerge {base_pkgs}"]
+        )
 
     # Run the app
     if parser.is_present("-d"):
@@ -286,7 +347,7 @@ def main():
         if not path.isdir(STORAGE_FOLDER):
             makedirs(STORAGE_FOLDER)
 
-        if not PKG_MGR.IS_WINDOWS:
+        if not pkg_mgr.IS_WINDOWS:
             local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
                                      "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
             print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}:{WSGI_PORT}")
