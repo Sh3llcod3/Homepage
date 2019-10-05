@@ -23,7 +23,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.2.9\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.3.0\n * Copyright (c) 2019 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -312,9 +312,9 @@ def main():
              '--enable-libx264 '
              '--enable-libx265 '
              '--enable-nonfree '
-             ' && make -j`nproc` && '
-             ' ln -sf $(readlink -f ffmpeg) /usr/local/bin/ffmpeg && '
-             ' ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe')
+             ' && make -j$(nproc) && '
+             ' sudo ln -sf $(readlink -f ffmpeg) /usr/local/bin/ffmpeg && '
+             ' sudo ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe')
         ]
 
         pkg_mgr.compile_dist_pkg(
