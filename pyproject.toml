@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "homepage"
-version = "0.3.0"
+version = "0.3.5"
 description = "A simple flask webapp to download the audio track from almost any internet video."
 authors = ["Sh3llcod3 <28938427+Sh3llcod3@users.noreply.github.com>"]
 license = "MIT"
