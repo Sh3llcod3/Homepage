@@ -134,7 +134,7 @@ description = "A user-friendly, lightweight command-line argument parser."
 name = "easyparse"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "1.0.5"
+version = "1.0.6"
 
 [[package]]
 category = "dev"
@@ -845,8 +845,8 @@ docutils = [
     {file = "docutils-0.15.2.tar.gz", hash = "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"},
 ]
 easyparse = [
-    {file = "easyparse-1.0.5-py3-none-any.whl", hash = "sha256:27fd3818b0a990c60be07ee516747accdbf2263e1deeece1c1021d60674f2be6"},
-    {file = "easyparse-1.0.5.tar.gz", hash = "sha256:d0093d644234e1f9b54df578229a42f700355a5a36798afed089b281d2ab67ff"},
+    {file = "easyparse-1.0.6-py3-none-any.whl", hash = "sha256:9895cf0d0fa5c090d56abd95037cf86d2e65058add8b8bc2bbf4c677e04dae1c"},
+    {file = "easyparse-1.0.6.tar.gz", hash = "sha256:0915299efbd6875387c7deb27e01c4dbd7aed1f49101a5e894407fbbd2b86943"},
 ]
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
