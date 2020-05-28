@@ -23,7 +23,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.3.7\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.3.8\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
