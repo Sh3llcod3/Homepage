@@ -12,14 +12,18 @@ class OSInteractionLayer():
     def __init__(self) -> None:
         self.IS_WINDOWS: bool = (platform.system().lower() == "windows")
 
-    def __get_distro(self) -> bool:
-        """Get the OS-release"""
+    def _get_distro(self) -> bool:
+        """Gets information from os-release file"""
+
+        def lookup_val(val: str) -> str:
+            return self.OS_RELEASE[self.OS_RELEASE.index(val) + 1].strip('"').lower()
 
         if not(self.IS_WINDOWS):
             with open(Path("/etc/os-release"), "r") as RELEASE_FILE:
                 self.OS_RELEASE: Union[List[str], str] = RELEASE_FILE.read().split("\n")
             self.OS_RELEASE = sum([i.split("=") for i in self.OS_RELEASE], [])
-            self.OS_RELEASE = self.OS_RELEASE[self.OS_RELEASE.index("ID") + 1].strip('"').lower()
+            self.OS_CODENAME: str = lookup_val("VERSION_CODENAME")
+            self.OS_RELEASE = lookup_val("ID")
             return True
 
         else:
@@ -73,7 +77,7 @@ class OSInteractionLayer():
         """Compile source packages, discriminate based on os-release"""
 
         try:
-            if self.__get_distro():
+            if self._get_distro():
                 for rel_actual_name, actions in dist_mapping.items():
                     if self.OS_RELEASE == rel_actual_name:
                         for compile_instruction in actions[1:]:

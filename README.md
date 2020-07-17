@@ -13,7 +13,7 @@ HomePage uses `youtube_dl` to download the videos, so quite a few sites are supp
 
 - `python 3.6` or above
 - The `pip` module for the above python version
-- `sudo` access if you wish to use port `80`
+- `sudo` access
 - `pyenv` installed (optional)
 - `poetry` installed (optional)
 
@@ -36,7 +36,7 @@ $ homepage -df
 ```
 
 Alternatively, if your system is running an older version of python or you wish to run this project inside
-a virtual environment, you can do that too. In fact, this is the __recommended__ method of installing this project.
+a virtual environment, you can do that too.
 
 First, go ahead and install [pyenv](https://github.com/pyenv/pyenv#basic-github-checkout). Then install [poetry](https://github.com/sdispater/poetry).
 Once you've installed those, we just to install a few more things.
@@ -44,11 +44,11 @@ Once you've installed those, we just to install a few more things.
 ```bash
 $ git clone https://github.com/Sh3llcod3/HomePage.git
 $ cd HomePage/
-$ pyenv install 3.7.4
-$ pyenv local 3.7.4
+$ pyenv install 3.8.4
+$ pyenv local 3.8.4
 $ poetry self:update --preview || poetry self update --preview
 $ poetry update
-$ poetry install # Add --no-dev if you don't want to tweak.
+$ poetry install # Add --no-dev if you don't want dev deps
 $ poetry shell
 $ homepage -ip
 $ homepage -df
@@ -94,7 +94,7 @@ fi
 You absolutely can. To change the background, change out `homepage/static/Background.jpg` with any image you like,
 but it has to be called `Background.jpg` and in the `JPEG` format. I will make this process easier in the future.
 
-#### Pyenv fails to install 3.7.4
+#### Pyenv fails to install 3.8.4
 
 You may have forgotten to install some crucial `pyenv` dependencies.
 If you're using other package managers, check [here](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
@@ -112,12 +112,10 @@ Then retry the `pyenv` installation.
 That is a really good question.
 I wanted a simple web app where I could download music from various videos on any
 device, without having access to a command line version of `youtube_dl` or resorting
-to using shady sites and apps.
+to using questionable sites and apps.
 
-The code is bad at best, but it is functional and you have the freedom of choice.
-Whether you want to use it or not is up to you, but I assumed that people prefer
-convenience, so I should probably upload this where more people may be able to take
-advantage of this.
+The code is bad at best, but it works and you have the freedom of choice.
+Whether you want to use it, is up to you.
 
 #### Why is it not working?
 
@@ -128,6 +126,7 @@ the library is updated frequently and you can pull in the updates very easily.
 If you're using it from PyPi, then:
 ```shell
 $ python3 -m pip install --upgrade youtube_dl gevent Flask --user
+$ youtube-dl --rm-cache-dir
 ```
 
 If you're using it from the `env`, then simply `cd` to the directory you installed it
@@ -139,30 +138,26 @@ $ poetry shell
 
 > You may want to write some sort of `cron` job to do this every few days or so.
 
-#### Does HomePage scale?
+#### Does HomePage scale to multiple users asynchronously?
 
 No. It was never intended to scale in the first place. Neither is it secure in any way.
 Therefore, I should stress that you should __NOT__ deploy this to anywhere except your
-private/internal network.
+RFC1918 private/internal network.
 
 #### Does it have Windows support?
 
-No. However I am planning to release compiled executables for both Windows and Linux so
-stay tuned for that, if you're interested.
+Yes. If you can get the latest executables for `lame`, `atomicparsley`, `faac`, `ffmpeg` and
+place them inside the project's directory, it should work.
 
-#### Why does it take a long time?
+#### Why does it take so long?
 
-Time is of the essence. I understand that if a specific computational task does not complete
-as quickly as someone anticipates, it can leave the user feeling disappointed.
+This depends on:
 
-However, the length of time it takes for a specific video to be downloaded heavily depends
-on several factors, such as the length, quantity and chosen quality of the download.
-On top of this, you have to consider that for each video you download, `youtube_dl` has
-to first download the video, then it has to be encoded in your preferred format using
-`ffmpeg`. That can take a while, especially on older systems.
-
-I am always looking to optimise this so it downloads and converts the videos faster, but
-if you have any tips, please create an issue and I'll check it out as soon as possible.
+- Number of CPU cores
+- If the single thread when downloading
+- Depends on speed of computer and version of ffmpeg
+- Size of download, network speed
+- Single track or playlist?
 
 ## To-do
 

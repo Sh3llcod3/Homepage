@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import tempfile
 from atexit import register
+from base64 import b64encode
 from datetime import datetime
 from os import environ, makedirs, path, remove, walk
 from pathlib import Path as FilePath
@@ -23,7 +24,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.3.9\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.4.0\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -132,7 +133,8 @@ def update_file_list():
         list_buffer = str()
         end_js = 'document.getElementById("Previous-Track-Table").style.display = "block";'
         for i in files:
-            list_buffer += list_item_template.format(file_full_name=i, previous_trackpath=safe_join("./transfer/", i))
+            fp = b64encode(safe_join("./transfer/", i).encode()).decode()
+            list_buffer += list_item_template.format(file_full_name=i, previous_trackpath=fp)
         return [list_buffer, end_js]
 
 
@@ -242,7 +244,7 @@ def main():
     # Add the iptables rule
     if not pkg_mgr.IS_WINDOWS:
         active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
-                                         shell=True).decode('utf-8').rstrip()  # noqa: S602
+                                        shell=True).decode('utf-8').rstrip()  # noqa: S602
 
     def remove_rule():
         print("\n * Reverting iptables rule.")
@@ -270,6 +272,8 @@ def main():
     # Treat as tty only, don't pull in x-org deps.
     if parser.is_present("-c"):
         ffmpeg_install_dir = FilePath(path.expanduser('~/.ffmpeg'))
+
+        aom_available: List[str] = ["focal"]
 
         deb_pkg_build: List[str] = [
             "apt",
@@ -316,6 +320,11 @@ def main():
              ' sudo ln -sf $(readlink -f ffmpeg) /usr/local/bin/ffmpeg && '
              ' sudo ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe')
         ]
+
+        pkg_mgr._get_distro()
+        if pkg_mgr.OS_CODENAME in aom_available:
+            deb_pkg_build[2] += " libaom0 libaom-dev"
+            deb_pkg_build[5] = deb_pkg_build[5].replace("--enable-libx265", "--enable-libx265 --enable-libaom ", 1)
 
         pkg_mgr.compile_dist_pkg(
             ubuntu=deb_pkg_build,
