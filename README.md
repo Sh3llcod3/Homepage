@@ -154,8 +154,8 @@ place them inside the project's directory, it should work.
 This depends on:
 
 - Number of CPU cores
-- If the single thread when downloading
-- Depends on speed of computer and version of ffmpeg
+- If the single thread is blocked somehow
+- Speed of computer and version of ffmpeg
 - Size of download, network speed
 - Single track or playlist?
 
