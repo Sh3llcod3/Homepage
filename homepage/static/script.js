@@ -68,7 +68,6 @@ function displayMDCSnackbar(a, b, c, d) {
 }
 
 function getPreviousTrack(trackPath){
-  trackPath = atob(trackPath).replace("#", "%23");
   let a = document.createElement('a');
   a.href = trackPath;
   a.download = trackPath.split('/').pop();

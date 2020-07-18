@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import tempfile
 from atexit import register
-from base64 import b64encode
 from datetime import datetime
 from os import environ, makedirs, path, remove, walk
 from pathlib import Path as FilePath
@@ -13,6 +12,7 @@ from shutil import make_archive, move as move_file
 from subprocess import call, check_output  # noqa: S404
 from sys import argv, exit
 from typing import List
+from urllib.parse import quote
 
 import easyparse
 
@@ -24,7 +24,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.4.0\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.4.1\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -133,7 +133,7 @@ def update_file_list():
         list_buffer = str()
         end_js = 'document.getElementById("Previous-Track-Table").style.display = "block";'
         for i in files:
-            fp = b64encode(safe_join("./transfer/", i).encode()).decode()
+            fp = quote(safe_join("./transfer/", i))
             list_buffer += list_item_template.format(file_full_name=i, previous_trackpath=fp)
         return [list_buffer, end_js]
 
@@ -243,7 +243,7 @@ def main():
 
     # Add the iptables rule
     if not pkg_mgr.IS_WINDOWS:
-        active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$'",  # noqa: S607
+        active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$' | awk {'print $1'}",  # noqa: S607
                                         shell=True).decode('utf-8').rstrip()  # noqa: S602
 
     def remove_rule():
@@ -292,6 +292,7 @@ def main():
              "wget "
              "zlib1g-dev "
              "nasm "
+             "net-tools "
              "yasm "
              "libx264-dev "
              "libx265-dev "

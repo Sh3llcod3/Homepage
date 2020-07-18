@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "homepage"
-version = "0.4.0"
+version = "0.4.1"
 description = "A simple flask webapp to download the audio track from almost any internet video."
 authors = ["Sh3llcod3 <28938427+Sh3llcod3@users.noreply.github.com>"]
 license = "MIT"
@@ -25,7 +25,7 @@ include = [
 [tool.poetry.dependencies]
 python = "^3.6"
 Flask = "*"
-youtube_dl = "*"
+youtube_dl = "~2020.5.29"
 easyparse = "*"
 gevent = "*"
 
@@ -39,8 +39,6 @@ flake8-tidy-imports = "*"
 flake8-todo = "*"
 setuptools = "*"
 twine = "*"
-pyinstaller = "*"
-Cython = "*"
 requests = "*"
 mypy = "*"
 
