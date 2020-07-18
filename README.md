@@ -9,13 +9,14 @@ HomePage uses `youtube_dl` to download the videos, so quite a few sites are supp
 
 ![HomePage](homepage/static/HomePage.png)
 
-## Setup & Prerequsites
+## Prerequsites
 
-- `python 3.6` or above
-- The `pip` module for the above python version
-- `sudo` access
-- `pyenv` installed (optional)
-- `poetry` installed (optional)
+- `python 3.6` or above with `pip`
+- `sudo` access (for port 80)
+- `pyenv` and `poetry` installed (optional)
+- `apt` package manager & package lists
+
+## Install
 
 The basic installation is very simple.
 
@@ -25,14 +26,14 @@ $ python3 -m pip install --user homepage
 # Normal desktop
 $ homepage -i
 
-# TTY only server
+# Server without x11
 $ homepage -ic
 ```
 
 Then, you can deploy with:
 
 ```bash
-$ homepage -df
+$ homepage -dfp
 ```
 
 Alternatively, if your system is running an older version of python or you wish to run this project inside
@@ -55,6 +56,25 @@ $ homepage -df
 ```
 
 After installing `pyenv`, the lines you add to your `~/.bashrc` may need to be different, please see the [FAQ](#faq--troubleshooting).
+
+## Uninstall
+
+If you installed using `pip`:
+
+```shell
+python3 -m pip uninstall -y homepage easyparse Flask youtube_dl gevent
+```
+
+and it will remove this completely from your system. You can vary this command based on what you want to keep.
+
+Otherwise, if you've installed using poetry and assuming you're inside the current directory:
+
+```shell
+$ exit # Exit virtualenv or press Ctrl-d
+$ poetry env remove 3.8
+$ poetry cache clear --all pypi
+$ cd .. && rm -rf HomePage/
+```
 
 ## Usage
 
