@@ -4,8 +4,9 @@ HomePage is a trivial flask web app that allows downloading the audio track from
 It is intended to be deployed inside a private network for personal use, so that hosts within the network can access
 and download the tracks they want.
 
-HomePage is very basic, but it has a Material Design front-end which is simple and easy to use.
+HomePage is very basic, but it has a simple and easy to use front-end.
 HomePage uses `youtube_dl` to download the videos, so quite a few sites are supported. Playlists are also supported.
+[`youtube_dl`](https://github.com/ytdl-org/youtube-dl/) has been taken down due to a copyright strike from GitHub, but this does not impact the PyPi version, so this will work as normal.
 
 ![HomePage](homepage/static/HomePage.png)
 
@@ -45,9 +46,9 @@ Once you've installed those, we just to install a few more things.
 ```bash
 $ git clone https://github.com/Sh3llcod3/HomePage.git
 $ cd HomePage/
-$ pyenv install 3.8.4
-$ pyenv local 3.8.4
-$ poetry self:update --preview || poetry self update --preview
+$ pyenv install 3.9.0
+$ pyenv local 3.9.0
+$ poetry poetry self update --preview
 $ poetry update
 $ poetry install # Add --no-dev if you don't want dev deps
 $ poetry shell
@@ -71,7 +72,7 @@ Otherwise, if you've installed using poetry and assuming you're inside the curre
 
 ```shell
 $ exit # Exit virtualenv or press Ctrl-d
-$ poetry env remove 3.8
+$ poetry env remove 3.9
 $ poetry cache clear --all pypi
 $ cd .. && rm -rf HomePage/
 ```
@@ -79,16 +80,12 @@ $ cd .. && rm -rf HomePage/
 ## Usage
 
 Once deployed, if you're using this on the device which is hosting it, fire up your
-favourite web browser and head to `http://0.0.0.0:5000/`. If you're on another device,
-simply head to the IP address that it prints out when you run it.
+favourite web browser and head to `http://localhost:5000/`. If you're on another device,
+simply head to the IP address of the host node.
 
-If you have `sudo` access, please use the `-f` switch. If you don't, other hosts can
-still use this, but they will need to explicitly specify the port, e.g. `http://192.168.0.10:5000`.
+If you have `sudo` access, use the `-f` switch. If you don't, port 80 will not be used.
 
-From there, you just need to select your options and paste in a link to the video or playlist
-that you want to download the tracks from. Obviously, you can download from `YouTube`, but thanks
-to the power of the `youtube_dl` library, many other sites will also work, e.g. `Vimeo`, or `Reddit`.
-You can find the full list [here](https://bit.ly/2XKgkuV).
+> Playlists are supported and all sites that will with ytdl will also work here.
 
 ## FAQ & Troubleshooting
 
@@ -114,7 +111,7 @@ fi
 You absolutely can. To change the background, change out `homepage/static/Background.jpg` with any image you like,
 but it has to be called `Background.jpg` and in the `JPEG` format. I will make this process easier in the future.
 
-#### Pyenv fails to install 3.8.4
+#### Pyenv fails to install 3.9.0
 
 You may have forgotten to install some crucial `pyenv` dependencies.
 If you're using other package managers, check [here](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
@@ -162,29 +159,26 @@ $ poetry shell
 
 No. It was never intended to scale in the first place. Neither is it secure in any way.
 Therefore, I should stress that you should __NOT__ deploy this to anywhere except your
-RFC1918 private/internal network.
+RFC1918 private/internal network with caution.
 
 #### Does it have Windows support?
 
 Yes. If you can get the latest executables for `lame`, `atomicparsley`, `faac`, `ffmpeg` and
 place them inside the project's directory, it should work.
 
-#### Why does it take so long?
+#### Why does it take long?
 
 This depends on:
 
-- Number of CPU cores
-- If the single thread is blocked somehow
 - Speed of computer and version of ffmpeg
 - Size of download, network speed
 - Single track or playlist?
 
 ## To-do
 
-- [ ] Add an authentication page.
-- [ ] Make site restore state after a download.
-- [ ] Save user preferences using cookies.
-- [ ] Display past tracks only for that host.
-- [ ] Add a separate page for management.
-- [ ] Create a system to auto-update `youtube_dl`
+- [ ] Add auth
+- [ ] Replace xhr with websocket
+- [ ] Save user preferences using cookies
+- [ ] Display past tracks only for that user
+- [ ] Add management card
 - [ ] Make it work on windows and generate executables
