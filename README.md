@@ -6,7 +6,7 @@ and download the tracks they want.
 
 HomePage is very basic, but it has a simple and easy to use front-end.
 HomePage uses `youtube_dl` to download the videos, so quite a few sites are supported. Playlists are also supported.
-[`youtube_dl`](https://github.com/ytdl-org/youtube-dl/) has been taken down due to a copyright strike from GitHub, but this does not impact the PyPi version, so this will work as normal.
+[`youtube_dl`](https://github.com/ytdl-org/youtube-dl/) has been taken down due to a copyright strike, but this does not impact the PyPi version, so this will work as normal.
 
 ![HomePage](homepage/static/HomePage.png)
 
