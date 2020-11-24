@@ -16,7 +16,10 @@ class OSInteractionLayer():
         """Gets information from os-release file"""
 
         def lookup_val(val: str) -> str:
-            return self.OS_RELEASE[self.OS_RELEASE.index(val) + 1].strip('"').lower()
+            try:
+                return self.OS_RELEASE[self.OS_RELEASE.index(val) + 1].strip('"').lower()
+            except(ValueError):
+                return ""
 
         if not(self.IS_WINDOWS):
             with open(Path("/etc/os-release"), "r") as RELEASE_FILE:

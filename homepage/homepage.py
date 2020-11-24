@@ -24,7 +24,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.4.5\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.5.0\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -218,7 +218,7 @@ def main():
         "-i",
         "--install-dependencies",
         None,
-        "Install some apt dependencies, only need to run once.",
+        "Install the dependencies, only need to run once.",
         optional=False
     )
     parser.add_arg(
@@ -274,33 +274,11 @@ def main():
         ffmpeg_install_dir = FilePath(path.expanduser('~/.ffmpeg'))
 
         aom_available: List[str] = ["focal"]
+        aom_releases: List[str] = ["arch"]
 
-        deb_pkg_build: List[str] = [
-            "apt",
-            "sudo apt update",
-            ("sudo apt -y install autoconf "
-             "automake "
-             "build-essential "
-             "cmake "
-             "git-core "
-             "libass-dev "
-             "libfreetype6-dev "
-             "libtool "
-             "libvorbis-dev "
-             "pkg-config "
-             "texinfo "
-             "wget "
-             "zlib1g-dev "
-             "nasm "
-             "net-tools "
-             "yasm "
-             "libx264-dev "
-             "libx265-dev "
-             "libnuma-dev "
-             "libvpx-dev "
-             "libfdk-aac-dev "
-             "libmp3lame-dev "
-             "libopus-dev"),
+        # Omit libaom unless proper binaries available
+        # We also don't need gnutls since ffplay isn't being compiled
+        ffmpeg_generic_compile: List[str] = [
             f"rm -rf {ffmpeg_install_dir}",
             f"git clone https://github.com/FFmpeg/FFmpeg.git {ffmpeg_install_dir}",
             (f'cd {ffmpeg_install_dir} && git pull --all --prune && ./configure '
@@ -319,26 +297,88 @@ def main():
              '--enable-nonfree '
              ' && make -j$(nproc) && '
              ' sudo ln -sf $(readlink -f ffmpeg) /usr/local/bin/ffmpeg && '
-             ' sudo ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe')
+             ' sudo ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe'),
+            'hash -r'
+        ]
+
+        deb_pkg_build: List[str] = [
+            "apt",
+            "sudo apt update",
+            ("sudo apt -y install autoconf "
+             "automake "
+             "build-essential "
+             "cmake "
+             "libass-dev "
+             "libfreetype6-dev "
+             "libtool "
+             "libvorbis-dev "
+             "pkg-config "
+             "texinfo "
+             "wget "
+             "zlib1g-dev "
+             "nasm "
+             "net-tools "
+             "yasm "
+             "libx264-dev "
+             "libx265-dev "
+             "libnuma-dev "
+             "libvpx-dev "
+             "libfdk-aac-dev "
+             "libmp3lame-dev "
+             "libopus-dev")
+        ]
+
+        arch_pkg_build: List[str] = [
+            "pacman",
+            "pacman -Syy",
+            ("pacman --noconfirm --needed -S autoconf "
+             "automake "
+             "base-devel "
+             "cmake "
+             "libass "
+             "freetype2 "
+             "libtool "
+             "libvorbis "
+             "pkg-config "
+             "texinfo "
+             "wget "
+             "gcc-libs zlib "
+             "nasm "
+             "net-tools "
+             "yasm "
+             "x264 "
+             "x265 "
+             "numactl "
+             "libvpx "
+             "libfdk-aac "
+             "lame "
+             "opus "
+             "aom")
         ]
 
         pkg_mgr._get_distro()
-        if pkg_mgr.OS_CODENAME in aom_available:
+        if pkg_mgr.OS_CODENAME in aom_available or pkg_mgr.OS_RELEASE in aom_releases:
             deb_pkg_build[2] += " libaom0 libaom-dev"
-            deb_pkg_build[5] = deb_pkg_build[5].replace("--enable-libx265", "--enable-libx265 --enable-libaom ", 1)
+            ffmpeg_generic_compile[2] = ffmpeg_generic_compile[2].replace(
+                "--enable-libx265", "--enable-libx265 --enable-libaom ", 1
+            )
+
+        deb_pkg_build += ffmpeg_generic_compile
+        arch_pkg_build += ffmpeg_generic_compile
 
         pkg_mgr.compile_dist_pkg(
             ubuntu=deb_pkg_build,
             kali=deb_pkg_build,
             mint=deb_pkg_build,
             debian=deb_pkg_build,
-            raspbian=deb_pkg_build
+            raspbian=deb_pkg_build,
+            arch=arch_pkg_build
         )
 
     # Install the package dependencies.
     if parser.is_present("-i"):
 
-        # Host is desktop, just install the deps as-is unless specified.
+        # Host is desktop, just install the deps as-is unless specified otherwise.
         base_pkgs: str = "lame atomicparsley faac "
         base_pkgs += "ffmpeg" if (not pkg_mgr.is_prog_present("ffmpeg") and not parser.is_present("-c")) else ""
 
@@ -360,7 +400,7 @@ def main():
         if not pkg_mgr.IS_WINDOWS:
             local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
                                      "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
-            print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip()}:{WSGI_PORT}")
+            print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip().split()[0]}:{WSGI_PORT if not parser.is_present('-f') else '80'}")  # noqa: E501
             print(f" * My default interface is: {active_interface}")
 
         try:
