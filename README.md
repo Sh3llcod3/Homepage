@@ -1,6 +1,6 @@
 # HomePage
 
-HomePage is a trivial flask web app that pulls the audio track and from almost any internet video.
+HomePage is a trivial flask web app that pulls the audio track from almost any internet video.
 It is intended to be deployed inside a private network for private use.
 
 HomePage relies on trustworthy `youtube_dl` to download the videos, so quite a few sites are supported. Playlists are also supported.
