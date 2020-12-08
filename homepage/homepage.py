@@ -9,7 +9,7 @@ from datetime import datetime
 from os import environ, makedirs, path, remove, walk
 from pathlib import Path as FilePath
 from shutil import make_archive, move as move_file
-from subprocess import call, check_output  # noqa: S404
+from subprocess import call, getoutput  # noqa: S404
 from sys import argv, exit
 from typing import List
 from urllib.parse import quote
@@ -24,7 +24,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.5.0\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.5.1\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -243,8 +243,9 @@ def main():
 
     # Add the iptables rule
     if not pkg_mgr.IS_WINDOWS:
-        active_interface = check_output("route | grep '^default' | grep -o '[^ ]*$' | awk {'print $1'}",  # noqa: S607
-                                        shell=True).decode('utf-8').rstrip()  # noqa: S602
+        active_interface = getoutput(
+            "route | grep '^default' | grep -o '[^ ]*$' | awk {'print $1'}",  # noqa: S607
+        )
 
     def remove_rule():
         print("\n * Reverting iptables rule.")
@@ -384,7 +385,7 @@ def main():
 
         pkg_mgr.install_packages(
             apt=["sudo apt update", f"sudo apt -y install {base_pkgs}"],
-            pacman=[f"sudo pacman --noconfirm -S {base_pkgs}"],
+            pacman=[f"sudo pacman --noconfirm --needed -S {base_pkgs}"],
             dnf=["sudo dnf update", f"sudo dnf -y install {base_pkgs}"],
             zypper=["zypper update", f"zypper -n install {base_pkgs}"],
             emerge=[f"NON_INTERACTIVE=1 emerge {base_pkgs}"]
@@ -398,8 +399,8 @@ def main():
             makedirs(STORAGE_FOLDER)
 
         if not pkg_mgr.IS_WINDOWS:
-            local_ip = check_output(("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
-                                     "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1"), shell=True)  # noqa: S602
+            local_ip = getoutput("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
+                                 "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1")  # noqa: S602
             print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip().split()[0]}:{WSGI_PORT if not parser.is_present('-f') else '80'}")  # noqa: E501
             print(f" * My default interface is: {active_interface}")
 
