@@ -24,7 +24,7 @@ import youtube_dl
 
 from .install_packages import OSInteractionLayer
 
-VERSION_STRING = " * HomePage, v0.5.1\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
+VERSION_STRING = " * HomePage, v0.5.2\n * Copyright (c) 2019-2020 Sh3llcod3. (MIT License)"
 WSGI_PORT = environ.get("HOMEPAGE_PORT", 5000)
 REQUEST_LOGLEVEL = environ.get("HOMEPAGE_REQUEST_LOG", None)
 LOG_DOWNLOAD = environ.get("HOMEPAGE_DOWNLOAD_LOG", 1)
@@ -401,7 +401,7 @@ def main():
         if not pkg_mgr.IS_WINDOWS:
             local_ip = getoutput("ip a | grep \"inet \" | grep -v \"127.0.0.1\" "  # noqa: S607
                                  "| awk -F ' ' {'print $2'} | cut -d \"/\" -f1")  # noqa: S602
-            print(f" * My local ip address is: {local_ip.decode('utf-8').rstrip().split()[0]}:{WSGI_PORT if not parser.is_present('-f') else '80'}")  # noqa: E501
+            print(f" * My local ip address is: {local_ip.split()[0]}:{WSGI_PORT if not parser.is_present('-f') else '80'}")  # noqa: E501
             print(f" * My default interface is: {active_interface}")
 
         try:
