@@ -79,7 +79,7 @@ $ cd .. && rm -rf HomePage/
 ## Usage
 
 Once deployed, if you're using this on the device which is hosting it, fire up your
-favourite web browser and head to `http://localhost:5000/`. If you're on another device,
+favourite web browser and head to the displayed address. If you're on another device,
 simply head to the IP address of the host node.
 
 If you have Superuser access, use the `-f` switch. This will add an iptables rule forwarding port 80 to 5000.

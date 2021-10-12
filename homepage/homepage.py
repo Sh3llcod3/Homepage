@@ -16,7 +16,7 @@ from urllib.parse import quote
 
 import easyparse
 
-from flask import Flask, render_template, request, safe_join, send_from_directory
+from flask import Flask, abort, render_template, request, safe_join, send_from_directory
 
 from gevent.pywsgi import WSGIServer
 
@@ -76,9 +76,26 @@ class Video():
             'progress_hooks': [ytdl_hook],
             'outtmpl': f'{temp_download_dir}/%(title)s.%(ext)s'
         }
+
+        self.webm_opt = {
+            'format': '251',
+            'postprocessors': [
+                {
+                    'key': 'FFmpegMetadata',
+                }
+            ],
+            'logger': YTDLLogger(),
+            'progress_hooks': [ytdl_hook],
+            'outtmpl': f'{temp_download_dir}/%(title)s.webm'
+        }
+
+        if self.mime_type == "opus":
+            self.ydl_opts = self.webm_opt
+
         if post_request["attach_thumb"].lower() == "yes":
             self.ydl_opts["writethumbnail"] = True
             self.ydl_opts["postprocessors"].append({'key': 'EmbedThumbnail', })
+
         if self.mime_type == "m4a":
             self.ydl_opts['postprocessor_args'] = [
                 '-strict', '-2'
@@ -86,8 +103,13 @@ class Video():
 
     # Add our download() method to download the video.
     def download(self):
-        with youtube_dl.YoutubeDL(self.ydl_opts) as self.ydl:
-            self.ydl.download([self.video_link])
+
+        try:
+            with youtube_dl.YoutubeDL(self.ydl_opts) as self.ydl:
+                self.ydl.download([self.video_link])
+
+        except(youtube_dl.utils.DownloadError):
+            abort(503)
 
     # Add our send_files() method to handle transfer.
     def send_files(self):
@@ -295,7 +317,7 @@ def main():
              '--enable-libvpx '
              '--enable-libx264 '
              '--enable-libx265 '
-             '--enable-nonfree '
+             '--enable-nonfree  --enable-gnutls'
              ' && make -j$(nproc) && '
              ' sudo ln -sf $(readlink -f ffmpeg) /usr/local/bin/ffmpeg && '
              ' sudo ln -sf $(readlink -f ffprobe) /usr/local/bin/ffprobe'),
@@ -326,7 +348,8 @@ def main():
              "libvpx-dev "
              "libfdk-aac-dev "
              "libmp3lame-dev "
-             "libopus-dev")
+             "libopus-dev "
+             "libunistring-dev")
         ]
 
         arch_pkg_build: List[str] = [
@@ -354,7 +377,8 @@ def main():
              "libfdk-aac "
              "lame "
              "opus "
-             "aom")
+             "aom "
+             "libunistring")
         ]
 
         pkg_mgr._get_distro()
