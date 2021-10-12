@@ -36,8 +36,10 @@ radio2.listen('click', () => {
   radio1.checked = false;
 });
 
-var checkbox = oneElementInit(".mdc-checkbox", mdc.checkbox.MDCCheckbox.attachTo);
-var checkboxFormField = oneElementInit("#checkbox-form-field", mdc.formField.MDCFormField.attachTo);
+let checkbox = oneElementInit("#checkbox-1", mdc.checkbox.MDCCheckbox.attachTo);
+let checkbox2 = oneElementInit("#checkbox-2", mdc.checkbox.MDCCheckbox.attachTo);
+let checkboxFormField = oneElementInit("#checkbox-form-field", mdc.formField.MDCFormField.attachTo);
+let checkboxFormField2 = oneElementInit("#checkbox-form-field-orig", mdc.formField.MDCFormField.attachTo);
 checkboxFormField.input = checkbox;
 checkbox.checked = true;
 
@@ -48,15 +50,23 @@ var qualityDict = {
 };
 
 var siteMenu = oneElementInit("#main-quality-menu", mdc.menu.MDCMenu.attachTo);
-document.getElementById("menu-opener-btn").addEventListener("click", function(evt){
+let format_btn = document.querySelector("#menu-opener-btn");
+format_btn.addEventListener("click", function(evt){
     siteMenu.open = !siteMenu.open;
 });
 siteMenu.listen("MDCMenu:selected", function(evt){
-  document.getElementById("menu-opener-btn").innerHTML = evt.detail.item.innerText;
+  format_btn.innerHTML = evt.detail.item.innerText;
 });
 oneElementInit("#menu-pref-1", mdc.ripple.MDCRipple.attachTo);
 oneElementInit("#menu-pref-2", mdc.ripple.MDCRipple.attachTo);
 oneElementInit("#menu-pref-3", mdc.ripple.MDCRipple.attachTo);
+
+checkbox2.listen('click', () => {
+  format_btn.disabled = !format_btn.disabled;
+  checkbox.disabled = !checkbox.disabled;
+  radio1.disabled = !radio1.disabled;
+  radio2.disabled = !radio2.disabled;
+});
 
 var mdcSnackBar = oneElementInit(".mdc-snackbar", mdc.snackbar.MDCSnackbar.attachTo);
 function displayMDCSnackbar(a, b, c, d) {
@@ -83,20 +93,28 @@ function sendDownloadRequest() {
     document.getElementById("form-field-1").style.display = "none";
     document.getElementById("form-field-2").style.display = "none";
     document.getElementById("checkbox-control").style.display = "none";
+    document.getElementById("checkbox-control-orig").style.display = "none";
     document.getElementById("checkbox-form-field").style.display = "none";
+    document.getElementById("checkbox-form-field-orig").style.display = "none";
     document.getElementById("quality-selection").style.display = "none";
     document.getElementById("site-menu-anchor").style.display = "none";
     var XHR = new XMLHttpRequest();
     var FD  = new FormData();
     FD.append("videoURL", downloadTextField.value);
 
-    if (radio1.checked) {
+    if (checkbox2.checked) {
+      FD.append("format_preference", "opus")
+    }
+    else if (radio1.checked) {
       FD.append("format_preference", "mp3");
     } else if (radio2.checked) {
       FD.append("format_preference", "m4a");
     }
 
-    if (checkbox.checked) {
+    if (checkbox2.checked) {
+      FD.append("attach_thumb", "no")
+    }
+    else if (checkbox.checked) {
       FD.append("attach_thumb", "yes");
     } else {
       FD.append("attach_thumb", "no");
