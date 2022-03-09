@@ -20,7 +20,7 @@ from flask import Flask, abort, render_template, request, safe_join, send_from_d
 
 from gevent.pywsgi import WSGIServer
 
-import youtube_dl
+import yt_dlp as youtube_dl
 
 from .install_packages import OSInteractionLayer
 
